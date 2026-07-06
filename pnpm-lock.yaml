@@ -93,12 +93,28 @@ importers:
         specifier: ^7.4.1
         version: 7.4.1
 
+  packages/cam:
+    dependencies:
+      geometry-wasm:
+        specifier: workspace:*
+        version: link:../geometry-wasm
+      scene:
+        specifier: workspace:*
+        version: link:../scene
+    devDependencies:
+      golden:
+        specifier: workspace:*
+        version: link:../../tools/golden
+
   packages/cv: {}
 
   packages/device-core: {}
 
   packages/fileformats:
     dependencies:
+      cam:
+        specifier: workspace:*
+        version: link:../cam
       fflate:
         specifier: ^0.8.2
         version: 0.8.3

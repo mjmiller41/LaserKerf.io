@@ -12,3 +12,11 @@ export {
   serializeFluence,
   type LoadedFluence,
 } from './fluence/fluence';
+export {
+  defaultMachine,
+  emitGcode,
+  type GcodeJob,
+  type GcodeOperation,
+  type MachineConfig,
+} from './gcode/gcode';
+export { simulate, type Simulation, type SimSegment } from './gcode/simulate';
