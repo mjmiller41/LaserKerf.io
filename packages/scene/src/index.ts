@@ -77,3 +77,12 @@ export {
 } from './model/factory';
 export type { LineBatch } from './render';
 export { sceneToLineBatches } from './render';
+export type { Command } from './history/history';
+export { composite, History } from './history/history';
+export {
+  addLayerCommand,
+  addShapeCommand,
+  removeShapeCommand,
+  updateLayerCommand,
+  updateShapeCommand,
+} from './history/commands';

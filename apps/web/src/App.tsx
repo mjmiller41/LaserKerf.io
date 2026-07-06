@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { EditorCanvas } from './editor/EditorCanvas';
+import { LayersPanel } from './editor/LayersPanel';
 import { Toolbar } from './editor/Toolbar';
 
 export function App() {
@@ -29,7 +30,10 @@ export function App() {
         </span>
       </header>
       <Toolbar />
-      <EditorCanvas />
+      <div className="editor-body">
+        <EditorCanvas />
+        <LayersPanel />
+      </div>
     </div>
   );
 }

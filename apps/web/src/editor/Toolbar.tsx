@@ -28,26 +28,49 @@ export function Toolbar() {
     const store = useEditor.getState();
     const shapes = store.selectedShapes();
     if (shapes.length < 2) return;
-    for (const s of align(shapes, mode)) store.updateShape(s);
+    const before = shapes.map((s) => ({ ...s }));
+    store.applyUpdates(before, align(shapes, mode));
   };
 
   const applyDistribute = (mode: DistributeMode): void => {
     const store = useEditor.getState();
     const shapes = store.selectedShapes();
     if (shapes.length < 3) return;
-    for (const s of distribute(shapes, mode)) store.updateShape(s);
+    const before = shapes.map((s) => ({ ...s }));
+    store.applyUpdates(before, distribute(shapes, mode));
   };
 
   const addExactRect = (): void => {
     const store = useEditor.getState();
-    const layerId = store.doc.layers[0].id;
     const cx = store.doc.width / 2 - 25;
     const cy = store.doc.height / 2 - 15;
-    store.addShapeAction(createRect(50, 30, { layerId, at: { x: cx, y: cy } }));
+    store.addShapeAction(createRect(50, 30, { layerId: store.activeLayerId, at: { x: cx, y: cy } }));
   };
 
+  const store = useEditor.getState();
   return (
     <div className="toolbar" data-testid="toolbar">
+      <div className="toolbar__group">
+        <button
+          type="button"
+          onClick={() => store.undo()}
+          disabled={!store.canUndo()}
+          data-testid="undo"
+          title="Undo (Ctrl+Z)"
+        >
+          ↶
+        </button>
+        <button
+          type="button"
+          onClick={() => store.redo()}
+          disabled={!store.canRedo()}
+          data-testid="redo"
+          title="Redo (Ctrl+Shift+Z)"
+        >
+          ↷
+        </button>
+      </div>
+
       <div className="toolbar__group">
         {TOOLS.map((t) => (
           <button

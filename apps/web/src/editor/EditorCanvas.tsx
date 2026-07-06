@@ -75,8 +75,21 @@ export function EditorCanvas() {
 
     const unsub = useEditor.subscribe(() => scheduleDraw());
     const onKey = (e: KeyboardEvent): void => {
+      const mod = e.ctrlKey || e.metaKey;
+      const key = e.key.toLowerCase();
       if (e.key === 'Delete' || e.key === 'Backspace') useEditor.getState().deleteSelection();
-      if (e.key === 'Escape') useEditor.getState().select([]);
+      else if (e.key === 'Escape') useEditor.getState().select([]);
+      else if (mod && key === 'a') {
+        e.preventDefault();
+        useEditor.getState().selectAll();
+      } else if (mod && key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) useEditor.getState().redo();
+        else useEditor.getState().undo();
+      } else if (mod && key === 'y') {
+        e.preventDefault();
+        useEditor.getState().redo();
+      }
     };
     globalThis.addEventListener('keydown', onKey);
 
@@ -214,7 +227,7 @@ export function EditorCanvas() {
       const dx = Math.round(doc.x - ps.startDoc.x);
       const dy = Math.round(doc.y - ps.startDoc.y);
       const store = useEditor.getState();
-      for (const original of ps.originals) store.updateShape(translatedShape(original, dx, dy));
+      for (const original of ps.originals) store.previewUpdate(translatedShape(original, dx, dy));
     } else if (ps.mode === 'draw') {
       previewBatch.current = {
         layerId: '__preview',
@@ -237,7 +250,7 @@ export function EditorCanvas() {
       const r = normalizeRect(ps.startDoc, doc);
       const w = Math.max(r.width, 0.5) || 20;
       const h = Math.max(r.height, 0.5) || 20;
-      const layerId = store.doc.layers[0].id;
+      const layerId = store.activeLayerId;
       let shape: Shape;
       if (store.tool === 'ellipse') {
         shape = createEllipse(w / 2, h / 2, { layerId, at: { x: r.x + w / 2, y: r.y + h / 2 } });
@@ -252,6 +265,8 @@ export function EditorCanvas() {
       store.addShapeAction(shape);
       store.setTool('select');
       previewBatch.current = null;
+    } else if (ps.mode === 'move') {
+      store.commitTransform(ps.originals);
     }
     pointer.current = { mode: 'none', startDoc: { x: 0, y: 0 }, originals: [] };
     scheduleDraw();
