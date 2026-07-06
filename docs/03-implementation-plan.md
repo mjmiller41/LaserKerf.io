@@ -32,42 +32,42 @@ Stop when every Acceptance box passes; then mark the card [x] and commit as "<TA
 
 ## Milestone M0 — Foundations (blocks everything)
 
-- [ ] **M0-T01 — Monorepo & toolchain** ∥
+- [x] **M0-T01 — Monorepo & toolchain** ∥
   - Goal: pnpm + Turborepo monorepo with the exact layout in `CLAUDE.md`; TS strict, ESLint/Prettier, Vitest, Playwright, Rust workspace for `apps/agent`, Emscripten toolchain for `packages/geometry-wasm`.
   - Deps: none. Refs: D§1.3, D§2, CLAUDE.md.
   - Files: root `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `tsconfig.base.json`, per-package scaffolds, CI stub.
   - Accept: `pnpm install` clean; `pnpm turbo build lint typecheck test` runs (empty packages OK); Rust `cargo build` in `apps/agent` compiles a stub.
   - Verify: `pnpm install && pnpm turbo build lint typecheck test`.
 
-- [ ] **M0-T02 — PWA shell + offline service worker**
+- [x] **M0-T02 — PWA shell + offline service worker**
   - Goal: installable Vite React PWA; Workbox service worker precaches app shell + WASM; manifest triggers install on Chromium desktop.
   - Deps: M0-T01. Refs: F§5 (offline), D§5 (full offline), CLAUDE.md invariant 3.
   - Files: `apps/web/*`, manifest, SW registration, precache config.
   - Accept: app installs as PWA; loads with network fully offline after first load; Lighthouse PWA installable.
   - Verify: `pnpm --filter web build && pnpm e2e:offline`.
 
-- [ ] **M0-T03 — Storage layer (OPFS blobs + IndexedDB meta) + crash-safe autosave**
+- [x] **M0-T03 — Storage layer (OPFS blobs + IndexedDB meta) + crash-safe autosave**
   - Goal: `packages/fileformats` storage module: project blobs in OPFS, metadata in IndexedDB; `navigator.storage.persist()`; debounced autosave.
   - Deps: M0-T01. Refs: F§5 (OPFS vs IDB, persist), D§4.7, D§5.
   - Files: `packages/fileformats/storage/*`.
   - Accept: 100MB blob write/read via OPFS; metadata query via IDB; persistence granted after PWA install; autosave restores after simulated crash.
   - Verify: `pnpm --filter fileformats test`.
 
-- [ ] **M0-T04 — Device interface + fake device/simulator** ∥
+- [x] **M0-T04 — Device interface + fake device/simulator** ∥
   - Goal: `packages/device-core` `Device` interface (`connect/disconnect/stream/jog/frame/home/status/stop`), transport registry, and a `FakeDevice` that simulates buffer + status for headless CAM/UI dev.
   - Deps: M0-T01. Refs: D§1.2 (abstraction rule), D§4.1, CLAUDE.md invariant 2.
   - Files: `packages/device-core/*`.
   - Accept: FakeDevice streams a G-code job, reports progress/status, honors stop/hold; zero DOM/UI deps.
   - Verify: `pnpm --filter device-core test`.
 
-- [ ] **M0-T05 — WASM build pipeline (Clipper2 smoke)**
+- [x] **M0-T05 — WASM build pipeline (Clipper2 smoke)**
   - Goal: `packages/geometry-wasm` builds Clipper2 C++→WASM; TS typed worker API via Comlink; round-trips a boolean op off-main-thread.
   - Deps: M0-T01. Refs: F§5 (Clipper2-WASM), D§2, D§5.
   - Files: `packages/geometry-wasm/*`, worker harness.
   - Accept: union/difference of two polygons returns correct geometry from a Worker; build reproducible in CI.
   - Verify: `pnpm --filter geometry-wasm build test`.
 
-- [ ] **M0-T06 — Test harnesses: golden-output + offline + CI**
+- [x] **M0-T06 — Test harnesses: golden-output + offline + CI**
   - Goal: golden-fixture harness (design+settings→machine code byte/tolerance match), offline Playwright suite, protocol-conformance scaffold, coordinate/units matrix scaffold; wire all into CI.
   - Deps: M0-T02..T05. Refs: D§4 (foundations), D§8 (testing).
   - Files: `e2e/*`, `tools/golden/*`, CI workflow.

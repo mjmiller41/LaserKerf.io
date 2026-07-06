@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+dev-dist
+coverage
+.turbo
+**/target
+**/*.wasm
+pnpm-lock.yaml
+packages/geometry-wasm/vendor
+playwright-report
+test-results
+# Hand-authored prose (planning docs, CLAUDE.md, READMEs) — not Prettier's to reflow.
+*.md

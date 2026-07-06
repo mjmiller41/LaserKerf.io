@@ -1,0 +1,9 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'tools/*'
+
+# pnpm 10+ blocks postinstall scripts unless the dependency is trusted.
+# esbuild (used by vite/vitest) fetches its platform binary via an install script.
+onlyBuiltDependencies:
+  - esbuild
