@@ -90,7 +90,7 @@ Stop when every Acceptance box passes; then mark the card [x] and commit as "<TA
 - [ ] **M1-T08 — Vector import: SVG/DXF/AI/PDF** ∥ — importers normalizing to the scene model; preserve layers/units where present. Deps: M1-T01. Refs: F§6 (import ✅), D§5 M1. Accept: reference files import with correct geometry/scale. Verify: import golden fixtures.
 - [ ] **M1-T09 — Raster import (PNG/JPG)** ∥ — image placement, scaling, DPI awareness (feeds M6). Deps: M1-T01. Refs: D§5 M1. Accept: images import at correct physical size. Verify: unit.
 - [ ] **M1-T10 — LightBurn `.lbrn`/`.lbrn2` import** — parse LightBurn XML → scene model (shapes, layers, cut settings mapping). Deps: M1-T07, M2-T01(cut settings map may land after; stub then complete). Refs: F§6 (🟡 lbrn import), D§7. Accept: representative `.lbrn` imports with shapes+layers; unmapped settings logged. Verify: import golden fixtures.
-- [ ] **M1-T11 — `.fluence` format v1 (open, versioned)** — zipped JSON + assets; save/load round-trip via storage layer; schema version + migration hook. Deps: M0-T03. Refs: D§1.2 (open format). Accept: full project round-trips losslessly; version field present. Verify: round-trip test.
+- [x] **M1-T11 — `.fluence` format v1 (open, versioned)** — zipped JSON + assets; save/load round-trip via storage layer; schema version + migration hook. Deps: M0-T03. Refs: D§1.2 (open format). Accept: full project round-trips losslessly; version field present. Verify: round-trip test.
 
 **M1 exit:** user can draw, import, and edit a real project to LightBurn-comparable fidelity; boolean/offset match golden; node editor handles all segment types. (D§5 M1)
 

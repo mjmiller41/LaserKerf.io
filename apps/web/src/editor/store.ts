@@ -50,6 +50,10 @@ export interface EditorState {
   addLayerAction(): void;
   updateLayer(id: LayerId, patch: Partial<Omit<Layer, 'id'>>): void;
 
+  loadDocument(doc: Document): void;
+  saveProject(): Promise<void>;
+  openProject(): Promise<void>;
+
   undo(): void;
   redo(): void;
   canUndo(): boolean;
@@ -137,6 +141,29 @@ export const useEditor = create<EditorState>((set, get) => ({
     const { doc, history } = get();
     history.execute(updateLayerCommand(doc, id, patch));
     set((s) => ({ version: s.version + 1 }));
+  },
+
+  loadDocument: (doc) =>
+    set((s) => ({
+      doc,
+      history: new History(),
+      selection: [],
+      activeLayerId: doc.layers[0].id,
+      version: s.version + 1,
+    })),
+
+  saveProject: async () => {
+    const { ProjectStore, serializeFluence } = await import('fileformats');
+    const store = await ProjectStore.open();
+    await store.save('current', 'Untitled', serializeFluence(get().doc));
+  },
+
+  openProject: async () => {
+    const { ProjectStore, deserializeFluence } = await import('fileformats');
+    const store = await ProjectStore.open();
+    const loaded = await store.load('current');
+    if (!loaded) return;
+    get().loadDocument(deserializeFluence(loaded.bytes).document);
   },
 
   undo: () => {

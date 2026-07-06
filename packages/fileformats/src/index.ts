@@ -6,3 +6,9 @@
  */
 export * from './storage/index';
 export * from './coordinate/coordinate';
+export {
+  deserializeFluence,
+  FLUENCE_FORMAT_VERSION,
+  serializeFluence,
+  type LoadedFluence,
+} from './fluence/fluence';

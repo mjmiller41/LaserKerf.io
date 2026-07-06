@@ -69,6 +69,12 @@ export function Toolbar() {
         >
           ↷
         </button>
+        <button type="button" onClick={() => void store.saveProject()} data-testid="save-project">
+          Save
+        </button>
+        <button type="button" onClick={() => void store.openProject()} data-testid="open-project">
+          Open
+        </button>
       </div>
 
       <div className="toolbar__group">
