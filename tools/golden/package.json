@@ -1,0 +1,17 @@
+{
+  "name": "golden",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Golden-output test harness: design + settings -> machine code must byte/tolerance-match a stored fixture. The single most important CAM guardrail (development-plan §4.3, §8).",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
+  }
+}

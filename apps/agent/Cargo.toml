@@ -1,0 +1,17 @@
+[package]
+name = "fluence-agent"
+version = "0.0.0"
+edition = "2021"
+description = "Fluence native companion Agent (M0 stub). Localhost WSS bridge to hardware the browser can't reach (Ruida DSP, galvo/fiber)."
+license = "UNLICENSED"
+publish = false
+
+[[bin]]
+name = "fluence-agent"
+path = "src/main.rs"
+
+[dependencies]
+
+# Empty [workspace] table makes this crate its own Cargo workspace root so
+# `cargo build` here is self-contained and never absorbed by a parent workspace.
+[workspace]

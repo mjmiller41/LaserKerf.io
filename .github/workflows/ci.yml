@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint · Typecheck · Test · Golden · Offline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # JS/TS packages (agent's Rust tasks run in the `agent` job).
+      - run: pnpm turbo lint typecheck test --filter=!agent
+
+      # Verify the WASM build pipeline resolves the prebuilt Clipper2 artifact.
+      - run: pnpm --filter geometry-wasm build
+
+      # The M0 guardrail suites (also covered by `turbo test`; kept explicit for visibility).
+      - run: pnpm --filter fileformats test:golden
+      - run: pnpm --filter fileformats test:coordinate
+      - run: pnpm --filter protocols test:conformance
+
+      # Offline invariant — real service worker + WASM in Chromium with the network cut.
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Offline invariant (Playwright)
+        run: pnpm e2e:offline
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  agent:
+    name: Agent (Rust)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/agent
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+      - run: cargo build --release
+
+  wasm-reproducible:
+    name: Clipper2 WASM from source (reproducibility)
+    runs-on: ubuntu-latest
+    # Non-gating: M0 ships the prebuilt npm artifact; this rebuilds from source
+    # (Emscripten) to keep the reproducibility path exercised.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mymindstorm/setup-emsdk@v14
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter geometry-wasm build:wasm
