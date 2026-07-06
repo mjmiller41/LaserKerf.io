@@ -6,3 +6,17 @@
  */
 export * from './storage/index';
 export * from './coordinate/coordinate';
+export {
+  deserializeFluence,
+  FLUENCE_FORMAT_VERSION,
+  serializeFluence,
+  type LoadedFluence,
+} from './fluence/fluence';
+export {
+  defaultMachine,
+  emitGcode,
+  type GcodeJob,
+  type GcodeOperation,
+  type MachineConfig,
+} from './gcode/gcode';
+export { simulate, type Simulation, type SimSegment } from './gcode/simulate';
