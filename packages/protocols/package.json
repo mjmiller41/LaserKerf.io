@@ -13,5 +13,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:conformance": "vitest run conformance"
+  },
+  "dependencies": {
+    "device-core": "workspace:*"
   }
 }
