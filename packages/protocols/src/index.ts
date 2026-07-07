@@ -14,5 +14,17 @@ export {
   type ConformanceVector,
   type ConformanceResult,
 } from './conformance/harness';
-export { type GrblResponse, parseResponse, REALTIME, splitLines } from './grbl/parse';
-export { GrblDevice, type GrblDeviceOptions, type TimerHost } from './grbl/grbl-device';
+export {
+  alarmMessage,
+  errorMessage,
+  type GrblResponse,
+  parseResponse,
+  REALTIME,
+  splitLines,
+} from './grbl/parse';
+export {
+  type ConsoleEntry,
+  GrblDevice,
+  type GrblDeviceOptions,
+  type TimerHost,
+} from './grbl/grbl-device';

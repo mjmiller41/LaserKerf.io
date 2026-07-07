@@ -23,7 +23,21 @@ import type {
   Transport,
   Vec3,
 } from 'device-core';
-import { type GrblResponse, parseResponse, REALTIME, splitLines } from './parse';
+import { alarmMessage, errorMessage, type GrblResponse, parseResponse, REALTIME, splitLines } from './parse';
+
+/** A raw console line, direction-tagged (M3-T04). */
+export interface ConsoleEntry {
+  dir: 'tx' | 'rx';
+  text: string;
+}
+
+const REALTIME_SYMBOL: Record<number, string> = {
+  [REALTIME.STATUS]: '?',
+  [REALTIME.HOLD]: '!',
+  [REALTIME.RESUME]: '~',
+  [REALTIME.RESET]: '^X',
+  [REALTIME.JOG_CANCEL]: 'jog-cancel',
+};
 
 /** Injectable interval timer (so status polling is testable without wall-clock). */
 export interface TimerHost {
@@ -55,6 +69,7 @@ export class GrblDevice implements Device {
   private readonly timers: TimerHost;
   private pollHandle: unknown = null;
   private readonly listeners = new Set<StatusListener>();
+  private readonly consoleListeners = new Set<(e: ConsoleEntry) => void>();
   private unsubscribe: (() => void) | null = null;
   private rx = '';
   private writeChain: Promise<void> = Promise.resolve();
@@ -129,6 +144,28 @@ export class GrblDevice implements Device {
     return () => {
       this.listeners.delete(listener);
     };
+  }
+
+  /** Subscribe to the raw TX/RX console stream (M3-T04). */
+  onConsole(listener: (entry: ConsoleEntry) => void): () => void {
+    this.consoleListeners.add(listener);
+    return () => {
+      this.consoleListeners.delete(listener);
+    };
+  }
+
+  /**
+   * Re-attach to the transport after a drop (auto-detection of an unplug is
+   * app-level via `listSerialPorts`; this restores a clean, idle device state).
+   */
+  async reconnect(): Promise<void> {
+    this.unsubscribe?.();
+    if (!this.transport.isOpen) await this.transport.open();
+    this.unsubscribe = this.transport.onData((chunk) => this.onData(chunk));
+    this.rx = '';
+    this.state = 'idle';
+    this.message = undefined;
+    this.emit();
   }
 
   stream(job: Job): JobHandle {
@@ -224,10 +261,25 @@ export class GrblDevice implements Device {
 
   /** Serialize all writes onto one chain (a serial writable takes one writer). */
   private send(bytes: Uint8Array): Promise<void> {
+    this.logTx(bytes);
     this.writeChain = this.writeChain.then(() => this.transport.write(bytes)).catch((err) => {
       this.fault(err instanceof Error ? err.message : String(err));
     });
     return this.writeChain;
+  }
+
+  private logTx(bytes: Uint8Array): void {
+    if (this.consoleListeners.size === 0) return;
+    const text =
+      bytes.length === 1 && REALTIME_SYMBOL[bytes[0]]
+        ? REALTIME_SYMBOL[bytes[0]]
+        : new TextDecoder().decode(bytes).replace(/\r?\n$/, '');
+    this.emitConsole('tx', text);
+  }
+
+  private emitConsole(dir: 'tx' | 'rx', text: string): void {
+    if (text === '') return;
+    for (const l of this.consoleListeners) l({ dir, text });
   }
 
   private bufferUsed(): number {
@@ -255,6 +307,7 @@ export class GrblDevice implements Device {
     const { lines, rest } = splitLines(this.rx);
     this.rx = rest;
     for (const l of lines) {
+      this.emitConsole('rx', l.trim());
       const resp = parseResponse(l);
       if (resp) this.handle(resp);
     }
@@ -268,7 +321,7 @@ export class GrblDevice implements Device {
           this.inFlight.shift();
           this.acked++;
           if (resp.type === 'error') {
-            this.fault(`error:${resp.code}`);
+            this.fault(`error:${resp.code} — ${errorMessage(resp.code)}`);
             return;
           }
           this.emit();
@@ -279,12 +332,14 @@ export class GrblDevice implements Device {
           }
         }
         break;
-      case 'alarm':
+      case 'alarm': {
+        const text = `ALARM:${resp.code} — ${alarmMessage(resp.code)}`;
         this.state = 'alarm';
-        this.message = `ALARM:${resp.code}`;
-        if (this.running) this.fault(this.message);
+        this.message = text;
+        if (this.running) this.fault(text);
         else this.emit();
         break;
+      }
       case 'status':
         if (!this.running) this.state = resp.state;
         if (resp.wpos) this.position = resp.wpos;

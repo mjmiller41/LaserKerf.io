@@ -84,3 +84,65 @@ export function splitLines(buffer: string): { lines: string[]; rest: string } {
   const rest = parts.pop() ?? '';
   return { lines: parts, rest };
 }
+
+/** GRBL 1.1 error codes → human text (documented constants). */
+const ERROR_MESSAGES: Record<number, string> = {
+  1: 'Expected command letter',
+  2: 'Bad number format',
+  3: 'Invalid $ statement',
+  4: 'Negative value',
+  5: 'Homing not enabled',
+  6: 'Step pulse too short',
+  7: 'EEPROM read failed; defaults restored',
+  8: '$ command needs idle state',
+  9: 'G-code locked out during alarm or jog',
+  10: 'Soft limits require homing',
+  11: 'Max characters per line exceeded',
+  12: '$ setting exceeds step rate',
+  13: 'Safety door detected as opened',
+  14: 'Build info / startup line too long',
+  15: 'Jog target exceeds travel',
+  16: 'Invalid jog command',
+  17: 'Laser mode requires PWM output',
+  20: 'Unsupported G/M command',
+  21: 'Modal group violation',
+  22: 'Feed rate not set',
+  23: 'Command value not integer',
+  24: 'Two G-code commands use axis words',
+  25: 'Repeated G-code word',
+  26: 'No axis words in command',
+  27: 'Line number out of range',
+  28: 'Missing required value word',
+  29: 'Unsupported work coordinate system',
+  30: 'G53 only valid with G0/G1',
+  31: 'Unused axis words',
+  32: 'G2/G3 arc needs in-plane axis word',
+  33: 'Invalid motion target',
+  34: 'Arc radius error',
+  35: 'G2/G3 arc needs in-plane offset word',
+  36: 'Unused value words',
+  37: 'G43.1 dynamic tool-length on wrong axis',
+  38: 'Tool number greater than max',
+};
+
+/** GRBL 1.1 alarm codes → human text (documented constants). */
+const ALARM_MESSAGES: Record<number, string> = {
+  1: 'Hard limit triggered',
+  2: 'Soft limit: motion target exceeds travel',
+  3: 'Reset while in motion; position lost',
+  4: 'Probe fail: not in expected initial state',
+  5: 'Probe fail: no contact within travel',
+  6: 'Homing fail: reset during homing',
+  7: 'Homing fail: safety door opened',
+  8: 'Homing fail: limit switch not found',
+  9: 'Homing fail: limit switch still active after pull-off',
+  10: 'Homing fail: dual-axis switch not found',
+};
+
+export function errorMessage(code: number): string {
+  return ERROR_MESSAGES[code] ?? `Unknown error (${code})`;
+}
+
+export function alarmMessage(code: number): string {
+  return ALARM_MESSAGES[code] ?? `Unknown alarm (${code})`;
+}
