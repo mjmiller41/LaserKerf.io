@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Transport } from 'device-core';
-import { GrblDevice } from './grbl-device';
-import { REALTIME } from './parse';
+import { type ConsoleEntry, GrblDevice } from './grbl-device';
+import { alarmMessage, errorMessage, REALTIME } from './parse';
 
 const enc = new TextEncoder();
 const tick = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
@@ -187,6 +187,52 @@ describe('GrblDevice real-time controls (M3-T03)', () => {
     expect(mock.realtime.filter((b) => b === REALTIME.STATUS)).toHaveLength(2);
     dev.stopStatusPoll();
     expect(cleared).toBe(true);
+  });
+
+  it('decodes error and alarm codes to human text on fault (M3-T04)', async () => {
+    const mock = new MockGrbl();
+    const dev = new GrblDevice(mock, { bufferSize: 100 });
+    await dev.connect();
+    const h = dev.stream({ lines: ['G1 X1'] });
+    await tick();
+    mock.pending.shift();
+    mock.reply('error:20');
+    await h.done;
+    expect(dev.status().message).toBe(`error:20 — ${errorMessage(20)}`);
+    expect(errorMessage(20)).toBe('Unsupported G/M command');
+    expect(alarmMessage(1)).toBe('Hard limit triggered');
+  });
+
+  it('streams a raw TX/RX console (M3-T04)', async () => {
+    const mock = new MockGrbl();
+    const dev = new GrblDevice(mock);
+    const log: ConsoleEntry[] = [];
+    dev.onConsole((e) => log.push(e));
+    await dev.connect();
+    const h = dev.stream({ lines: ['G0 X5'] });
+    await tick();
+    mock.ackAll();
+    await h.done;
+    await dev.requestStatus();
+    await tick();
+    expect(log).toContainEqual({ dir: 'tx', text: 'G0 X5' });
+    expect(log).toContainEqual({ dir: 'rx', text: 'ok' });
+    expect(log).toContainEqual({ dir: 'tx', text: '?' }); // real-time byte symbol
+  });
+
+  it('reconnects after a transport drop (M3-T04)', async () => {
+    const mock = new MockGrbl();
+    const dev = new GrblDevice(mock);
+    await dev.connect();
+    await mock.close();
+    await dev.reconnect();
+    expect(mock.isOpen).toBe(true);
+    expect(dev.status().state).toBe('idle');
+    // Streaming works again after reconnect.
+    const h = dev.stream({ lines: ['G0 X0'] });
+    await tick();
+    mock.ackAll();
+    expect((await h.done).status).toBe('completed');
   });
 
   it('cancels a jog with the real-time byte', async () => {
