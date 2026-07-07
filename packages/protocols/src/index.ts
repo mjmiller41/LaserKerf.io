@@ -14,3 +14,5 @@ export {
   type ConformanceVector,
   type ConformanceResult,
 } from './conformance/harness';
+export { type GrblResponse, parseResponse, REALTIME, splitLines } from './grbl/parse';
+export { GrblDevice, type GrblDeviceOptions } from './grbl/grbl-device';

@@ -169,7 +169,11 @@ importers:
         specifier: workspace:*
         version: link:../../tools/golden
 
-  packages/protocols: {}
+  packages/protocols:
+    dependencies:
+      device-core:
+        specifier: workspace:*
+        version: link:../device-core
 
   packages/scene: {}
 
