@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feasibility Study: A Browser-Based / Installable-PWA &quot;LightBurn&quot; Clone with Full Offline Capability</title>
+<style>
+  :root{
+    /* === Real tokens, verbatim from apps/web/src/styles.css :root === */
+    --bg:#0b0f14;
+    --panel:#131a22;
+    --border:#223040;
+    --text:#e6edf3;
+    --muted:#8b98a5;
+    --accent:#f0653a;
+
+    /* === Recurring literal values used across styles.css (not declared as vars,
+           but consistent enough to be de-facto tokens) === */
+    --surface:#1a2430;      /* button / input / control fill */
+    --toolbar:#0f151c;      /* toolbar strip */
+    --canvas:#0b0e13;       /* editor canvas / console bg */
+    --accent-ink:#1a0d06;   /* text on accent (active toolbar btn) */
+    --accent-ink2:#10151c;  /* text on accent (CAM generate) */
+    --ok:#3fb950;           /* online / success */
+    --warn:#f5b942;         /* stale / warning */
+    --err:#ff6b6b;          /* error */
+
+    /* radii observed in the app */
+    --r-sm:3px; --r-md:4px; --r-lg:5px; --r-xl:6px; --r-brand:12px; --r-pill:999px;
+
+    --mono:ui-monospace, monospace;
+    --sans:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html{scrollbar-width:thin;scrollbar-color:var(--line) var(--ink)}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:var(--ink)}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px;border:2px solid var(--ink)}
+  html,body{margin:0;background:var(--ink);color:var(--text);
+    font-family:var(--sans);line-height:1.62;-webkit-font-smoothing:antialiased}
+  body{background:radial-gradient(760px 300px at 50% -140px,rgba(227,165,82,.07),transparent 70%),var(--ink);
+    padding:26px 18px 80px;font-size:14.5px}
+  .wrap{max-width:800px;margin:0 auto}
+  .doc-mast{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+    border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:22px}
+  .doc-mast .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--faint)}
+  .doc-mast .eyebrow b{color:var(--brass)}
+  .doc-mast .src{font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+  main h1,main h2,main h3,main h4{font-weight:800;letter-spacing:-.01em;line-height:1.25;color:var(--text)}
+  main h1{font-size:26px;margin:.2em 0 .5em}
+  main h2{font-size:20px;margin:1.7em 0 .5em;border-top:1px solid var(--line);padding-top:.8em}
+  main h3{font-size:16px;margin:1.4em 0 .4em}
+  main h4{font-size:13px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  main p{margin:.7em 0;color:var(--text)}
+  main a{color:var(--brass);text-decoration:none}
+  main a:hover{text-decoration:underline}
+  main strong{color:#fff}
+  main ul,main ol{margin:.6em 0;padding-left:1.4em}
+  main li{margin:.28em 0}
+  main li::marker{color:var(--faint)}
+  main code{font-family:var(--mono);font-size:.86em;color:#C9CEDF;background:var(--ink2);
+    padding:1px 5px;border-radius:4px}
+  main pre{background:var(--ink2);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:13px 15px;overflow:auto;line-height:1.5}
+  main pre code{background:none;padding:0;color:#C9CEDF;font-size:12px}
+  main blockquote{margin:1em 0;border-left:3px solid var(--brass-dim);background:var(--ink2);
+    border-radius:0 var(--r-md) var(--r-md) 0;padding:2px 16px;color:var(--muted)}
+  main table{border-collapse:collapse;width:100%;margin:1em 0;font-size:13px;display:block;overflow-x:auto}
+  main th,main td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  main th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  main tr:hover td{background:var(--ink2)}
+  main hr{border:none;border-top:1px solid var(--line);margin:1.8em 0}
+  main img{max-width:100%;border-radius:var(--r-md)}
+  main input[type=checkbox]{accent-color:var(--brass);margin-right:6px}
+  .doc-foot{margin-top:44px;border-top:1px solid var(--line);padding-top:14px;
+    font-family:var(--mono);font-size:10px;color:var(--faint)}
+
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="doc-mast">
+      <span class="eyebrow"><b>▸</b> Feasibility Study: A Browser-Based / Installable-PWA &quot;LightBurn&quot; Clone with Full Offline Capability</span>
+      <span class="src">01-feasibility-study.md</span>
+    </div>
+    <main>
+<h1 id="feasibility-study-a-browser-based-installable-pwa-lightburn-clone-with-full-offline-capability">Feasibility Study: A Browser-Based / Installable-PWA "LightBurn" Clone with Full Offline Capability</h1>
+<p><strong>Prepared:</strong> July 2026<br>
+<strong>Scope:</strong> Commercial product. GRBL-first, with a phased path to Ruida DSP and galvo/fiber. Full offline operation as a hard requirement.<br>
+<strong>Note:</strong> Legal sections are general information, US-centric, and not legal advice. Have a qualified IP attorney review before launch.</p>
+<hr>
+<h2 id="1-verdict">1. Verdict</h2>
+<p><strong>Conditionally GO — but not as a "pure browser" product.</strong> The honest architecture is a <strong>web app (installable PWA) with an optional downloadable local agent.</strong> A browser alone can cleanly cover the GRBL-over-USB case you want to start with, and the entire design/CAM half of the product. It <strong>cannot</strong> cover the professional Ruida-over-Ethernet case that defines LightBurn's high-margin "Pro" tier, because browsers cannot open raw UDP sockets. That single platform limit is the fulcrum of the whole plan.</p>
+<p>The good news: the market seam is real and defensible. LightBurn dropped Linux, raised prices, and remains desktop-only; Glowforge is web-based but cloud-locked and unusable offline. Nobody ships a polished, cross-platform, <strong>offline-capable</strong> web tool in this space. The reason nobody has isn't that it's impossible — it's that it requires (a) Chromium-only browser lock-in, (b) hand-rolling robust real-time serial streaming in-browser, and (c) a small native helper for the pro hardware. All three are surmountable.</p>
+<p><strong>One-line recommendation:</strong> Build the GRBL MVP as a Chromium PWA using Web Serial; treat Ruida/galvo as Phase 2–3 delivered through a downloadable local agent, exactly as LightBurn itself does with its "Bridge."</p>
+<hr>
+<h2 id="2-the-central-technical-constraint-read-this-first">2. The central technical constraint (read this first)</h2>
+<p>Browsers give you <strong>two</strong> hardware doors and <strong>no</strong> third:</p>
+<ul>
+<li><strong>Web Serial API</strong> — read/write to serial/COM ports (USB-serial chips like CH340/FTDI/CP210x). This is the correct door for GRBL.</li>
+<li><strong>WebUSB API</strong> — raw bulk/control transfers to a user-selected USB device. Relevant for galvo boards.</li>
+<li><strong>Raw UDP/TCP sockets — do not exist in the browser.</strong> JavaScript can only speak HTTP(S), WebSocket (TCP-like, reliable), WebRTC data channels, and WebTransport (QUIC to a cooperating server). None of these can address a raw UDP device on your LAN.</li>
+</ul>
+<p>Consequences that cascade through the entire roadmap:</p>
+<table>
+<thead>
+<tr>
+<th>Hardware / link</th>
+<th>Reachable from a pure browser?</th>
+<th>Native local agent required?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GRBL over USB serial</td>
+<td><strong>Yes</strong> — Web Serial, Chromium desktop</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Ruida over <strong>Ethernet/UDP</strong> (ports 50200/40200)</td>
+<td><strong>No — architecturally impossible</strong></td>
+<td><strong>Yes, unavoidable</strong></td>
+</tr>
+<tr>
+<td>Ruida over USB (FTDI FT245R)</td>
+<td>Maybe (Chromium Web Serial) if the OS exposes a COM port; fragile, permission-gated</td>
+<td>Recommended</td>
+</tr>
+<tr>
+<td>Galvo/fiber (BJJCZ EZCAD2, VID 0x9588/PID 0x9899) over USB</td>
+<td>Maybe (Chromium WebUSB), but needs WinUSB driver via Zadig</td>
+<td>Recommended; and required for any network use</td>
+</tr>
+</tbody>
+</table>
+<p>This is why the product must be conceived from day one as <strong>"web app + optional agent,"</strong> not "browser-only." Framing it any other way sets up a Phase-2 wall you cannot climb.</p>
+<p>Sources: <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API">MDN — WebSockets API</a>; <a href="https://www.computerenhance.com/p/no-really-why-cant-we-have-raw-udp">"No, really, why can't we have raw UDP"</a>; <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebTransport_API">MDN — WebTransport</a>; <a href="https://edutechwiki.unige.ch/en/Ruida">EduTech Wiki — Ruida</a>; <a href="https://docs.lightburnsoftware.com/LightBurnBridge.html">LightBurn Bridge docs</a>.</p>
+<hr>
+<h2 id="3-phase-1-grbl-over-web-serial-the-mvp">3. Phase 1 — GRBL over Web Serial (the MVP)</h2>
+<h3 id="browser-support-as-of-mid-2026">Browser support (as of mid-2026)</h3>
+<ul>
+<li><strong>Chrome / Edge / Opera desktop:</strong> Web Serial shipped and stable since <strong>Chrome 89 (March 2021)</strong>. Solid. (<a href="https://caniuse.com/web-serial">caniuse</a>)</li>
+<li><strong>Chrome for Android:</strong> Web Serial only began arriving around <strong>Chrome 148 (beta April 2026)</strong>, Bluetooth-SPP-first; native USB serial gated to a limited device set rolling out through 2026. Treat mobile as a bonus, not a target. (<a href="https://caniuse.com/web-serial">caniuse</a>; <a href="https://www.notebookcheck.net/Chrome-148-Beta-for-Android-adds-Web-Serial-SharedWorker-support.1269721.0.html">Notebookcheck</a>)</li>
+<li><strong>Safari (macOS/iOS/iPadOS):</strong> <strong>Not supported, WebKit is officially "opposed"</strong> on fingerprinting grounds. Hard blocker — no iPhone/iPad control, ever, in-browser. (<a href="https://webkit.org/tracking-prevention/">WebKit tracking prevention</a>)</li>
+<li><strong>Firefox:</strong> historically unsupported, Mozilla "neutral." caniuse shows Firefox 151+ as supported but this is <strong>contested</strong> (add-on-gated in Nightly). Do not count on it. (<a href="https://mozilla.github.io/standards-positions/#webserial">Mozilla standards positions</a>)</li>
+</ul>
+<p><strong>Realistic near-term addressable browsers: Chrome and Edge on desktop.</strong> That is the same practical footprint as many pro creative web tools, and it is enough for a commercial launch — but it must be stated plainly in marketing to avoid support blowback.</p>
+<h3 id="permission-model">Permission model</h3>
+<p><code>navigator.serial.requestPort()</code> shows a user-controlled device chooser, must be triggered by a click (transient user activation), and cannot silently enumerate ports. Grants <strong>persist per origin</strong>; <code>getPorts()</code> lets a returning user reconnect without re-picking. This is a clean UX once the user has authorized their machine once. (<a href="https://developer.mozilla.org/en-US/docs/Web/API/Serial/requestPort">MDN — requestPort</a>)</p>
+<h3 id="can-you-actually-stream-and-jog-in-real-time-yes">Can you actually stream and jog in real time? Yes.</h3>
+<p>GRBL's high-performance streaming is the <strong>character-counting protocol</strong>: the host tracks bytes in GRBL's ~127-byte RX buffer and only sends more when there's room, decrementing on each <code>ok</code>/<code>error</code>. Web Serial's read/write streams are fully sufficient to implement it. GRBL's <strong>real-time command bytes</strong> (jog <code>$J=</code>, feed hold <code>!</code>, cycle start <code>~</code>, soft-reset <code>0x18</code>, status <code>?</code>) bypass the line buffer, which is exactly what makes responsive browser jogging possible. (<a href="https://github.com/gnea/grbl/wiki/Grbl-v1.1-Interface">GRBL v1.1 interface</a>)</p>
+<p>The dominant latency/jitter risk is <strong>not</strong> the browser — it's USB-serial chip buffering and the non-real-time host OS, which affect native apps identically. Mitigations: run the streaming loop in a <strong>Web Worker</strong> (SharedWorker now available), implement character-counting rather than naive send-and-wait, and build robust reconnection. You must hand-roll this logic; the browser gives you the pipe, not the protocol.</p>
+<h3 id="competitive-precedent-and-the-gap">Competitive precedent — and the gap</h3>
+<p>The serious incumbents are <strong>not</strong> pure-browser apps:</p>
+<ul>
+<li><strong>gSender</strong> (Sienci) and <strong>OpenBuilds CONTROL</strong> are <strong>Electron desktop apps</strong>.</li>
+<li><strong>CNCjs, LaserWeb4, ChiliPeppr, Grbl-Web</strong> are web UIs backed by a <strong>local Node/agent server</strong> that owns the serial port over a WebSocket bridge.</li>
+<li>Pure-browser Web Serial senders exist only at <strong>hobby scale</strong> (browserGcodeSender / gcodesender.com, SerialTerminal.com).</li>
+</ul>
+<p><strong>No mature, LightBurn-class, pure-browser Web Serial laser suite exists.</strong> That is your differentiation — and also a caution: the absence reflects the Chromium lock-in and the engineering discipline required to make in-browser streaming rock-solid. (<a href="https://github.com/Sienci-Labs/gsender">gSender</a>; <a href="https://github.com/cncjs/cncjs/wiki/Introduction">CNCjs wiki</a>; <a href="https://github.com/LaserWeb/LaserWeb4">LaserWeb4</a>; <a href="https://gcodesender.com/">gcodesender.com</a>)</p>
+<hr>
+<h2 id="4-phases-23-ruida-dsp-and-galvofiber-where-the-agent-is-unavoidable">4. Phases 2–3 — Ruida DSP and galvo/fiber (where the agent is unavoidable)</h2>
+<h3 id="ruida-professional-co2">Ruida (professional CO2)</h3>
+<ul>
+<li><strong>Transport:</strong> Ethernet/UDP (laser listens on <strong>50200</strong>, replies from <strong>40200</strong>) and USB (FTDI <strong>FT245R</strong> serial). (<a href="https://edutechwiki.unige.ch/en/Ruida">EduTech Wiki — Ruida</a>)</li>
+<li><strong>Protocol:</strong> proprietary but well reverse-engineered. Packets carry a 2-byte checksum; the laser ACKs <strong>0xCC</strong> (ok) / <strong>0xCF</strong> (fail); payload bytes are "swizzled" per a per-model table. Command bytes set the high bit, producing Ruida's unusual 14-/35-bit integers. Reference implementations: <strong>MeerK40t</strong> (full controller + emulator), <strong>jnweiger/ruida-laser</strong> (protocol docs + UDP proxy), <strong>StevenIsaacs/ruida-protocol-analyzer</strong>. (<a href="https://github.com/meerk40t/meerk40t/blob/main/meerk40t/ruida/controller.py">MeerK40t controller</a>; <a href="https://github.com/jnweiger/ruida-laser/blob/master/doc/protocol.md">jnweiger protocol.md</a>)</li>
+<li><strong>Browser reality:</strong> the common Ethernet setup is <strong>impossible from a browser</strong> (no raw UDP). You must ship a <strong>downloadable native local agent</strong> — a small app exposing <code>ws://localhost</code> that translates browser messages into checksummed/swizzled UDP 50200 packets with ACK/resend. This mirrors LightBurn's own <strong>Bridge</strong>. The USB path <em>might</em> work via Chromium Web Serial if the OS surfaces a COM port, but it's fragile and you'd still re-implement the framing in JS.</li>
+</ul>
+<h3 id="galvo-fiber-ezcad2-bjjcz-jcz">Galvo / fiber (EZCAD2 / BJJCZ / JCZ)</h3>
+<ul>
+<li><strong>Hardware:</strong> typically a <strong>BJJCZ LMCV4-FIBER</strong> board (VID <strong>0x9588</strong>, PID <strong>0x9899</strong>) driving the head via the open <strong>XY2-100</strong> protocol; the PC↔board USB link is proprietary, reverse-engineered by packet capture. Three USB endpoints (BULK command, status poll, anti-clone dongle). (<a href="https://www.bryce.pw/engraver.html">bryce.pw/engraver</a>; <a href="https://edutechwiki.unige.ch/en/LMCV4-FIBER-M">EduTech Wiki — LMCV4</a>)</li>
+<li><strong>RE maturity:</strong> high — <strong>Balor</strong>, <strong>balor-meerk40t</strong>, and MeerK40t's <strong>galvoplotter</strong> all drive these boards via libusb/pyusb. (<a href="https://github.com/meerk40t/galvoplotter">galvoplotter</a>)</li>
+<li><strong>Browser reality:</strong> a vendor USB device with BULK endpoints fits <strong>WebUSB</strong> better than Web Serial, but WebUSB can't claim the interface while the OS/EZCAD driver holds it — users would need <strong>Zadig/WinUSB</strong>, which breaks the vendor software. Millisecond polling and dongle handling add fragility. <strong>A native agent is the robust path.</strong> (<a href="https://github.com/WICG/webusb/issues/56">WICG WebUSB issue #56</a>; <a href="https://docs.lightburnsoftware.com/latest/Guides/GalvoDriverInstallation/">LightBurn galvo driver guide</a>)</li>
+</ul>
+<h3 id="the-strategic-implication">The strategic implication</h3>
+<p>Your "pure web" story holds for the hobbyist GRBL segment. The <strong>paid-Pro segment (Ruida + galvo) requires a native helper regardless.</strong> That's not a defeat — it's the same shape as LightBurn's Bridge and the CNCjs/LaserWeb model. Design the agent once (a signed, auto-updating localhost WebSocket↔device bridge for Win/Mac/Linux) and both Pro hardware classes flow through it. It also, as a bonus, restores the cross-platform/offline story that a pure browser gives you anyway.</p>
+<hr>
+<h2 id="5-offline-pwa-heavy-geometry-architecture-the-designcam-half">5. Offline PWA + heavy-geometry architecture (the design/CAM half)</h2>
+<p>This half is <strong>strongly feasible</strong> and is where the product can match or beat LightBurn on portability.</p>
+<h3 id="full-offline">Full offline</h3>
+<p>A service worker pre-caching the app shell (HTML/JS/CSS/<strong>WASM</strong>) via the Cache API delivers genuine offline operation after one online load. PWAs install as standalone windowed apps on Windows/macOS/Linux in Chrome/Edge; a valid manifest triggers install (SW still needed for offline). (<a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/js13kGames/Offline_Service_workers">MDN — offline SW</a>; <a href="https://web.dev/learn/pwa/service-workers">web.dev — service workers</a>)</p>
+<h3 id="project-storage">Project storage</h3>
+<p>Store project blobs in <strong>OPFS</strong> (Origin Private File System), structured metadata in <strong>IndexedDB</strong>. OPFS is dramatically faster for large binaries — a 100 MB write measured <strong>~90 ms (OPFS) vs ~850 ms (IndexedDB)</strong>. Chromium can use up to ~60% of disk per origin. Call <code>navigator.storage.persist()</code> to opt out of eviction; <strong>installing as a PWA auto-grants persistence in Chrome/Edge with no prompt.</strong> (<a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria">MDN — storage quotas</a>; <a href="https://developer.mozilla.org/en-US/docs/Web/API/File_System_API/Origin_private_file_system">MDN — OPFS</a>)</p>
+<h3 id="wasm-geometry-core">WASM geometry core</h3>
+<p>Expect WASM to run roughly <strong>1.3×–2.5× slower than native C++</strong> (peer-reviewed: ~45% slower in Firefox, ~55% in Chrome on SPEC; tighter on compute-bound loops). Fast enough for interactive laser CAM. Usable libraries:</p>
+<ul>
+<li><strong>Clipper2-WASM</strong> — polygon boolean ops + offsetting → <strong>kerf compensation and toolpath offset, solved.</strong> (<a href="https://github.com/ErikSom/Clipper2-WASM">Clipper2-WASM</a>)</li>
+<li><strong>Potrace-WASM</strong> / <strong>VTracer</strong> (Rust→WASM, O(n) vs Potrace O(n²)) → <strong>raster-to-vector import.</strong> (<a href="https://github.com/visioncortex/vtracer">VTracer</a>)</li>
+<li>Image dithering and path planning: <strong>no dominant WASM lib</strong> — expect custom work (port C or write in Rust). Flag this as real effort.</li>
+<li>CGAL/WASM: <strong>risky</strong> — WASM lacks FP rounding-mode control, which undermines CGAL's exact arithmetic. Avoid; you don't need B-rep for 2D laser CAM anyway.</li>
+</ul>
+<p>(<a href="https://www.usenix.org/system/files/atc19-jangda.pdf">USENIX ATC'19 "Not So Fast"</a>)</p>
+<h3 id="rendering">Rendering</h3>
+<p>Canvas2D bottlenecks on thousands of paths; use <strong>WebGL (or WebGPU)</strong> on an <strong>OffscreenCanvas</strong> inside a worker to keep the UI at 60fps. (<a href="https://semisignal.com/a-look-at-2d-vs-webgl-canvas-performance/">2D vs WebGL canvas perf</a>)</p>
+<h3 id="proof-its-possible-at-pro-grade">Proof it's possible at pro grade</h3>
+<p><strong>Figma</strong> is the anchor precedent: its rendering engine is <strong>C++ compiled to WASM</strong>, drawing straight to the GPU; moving to WASM <strong>cut load time &gt;3×</strong>, and it now targets WebGPU. Pro-grade 2D vector editing at 60fps in a browser is a settled question. <strong>CADmium/Truck</strong> show a client-side WASM CAD kernel is achievable; <strong>SVGcode</strong> is a shipping PWA using Potrace-in-WASM (exactly your import feature). (<a href="https://www.figma.com/blog/webassembly-cut-figmas-load-time-by-3x/">Figma WASM</a>)</p>
+<hr>
+<h2 id="6-feature-parity-map-vs-lightburn">6. Feature-parity map vs LightBurn</h2>
+<p>LightBurn represents <strong>~8–9 years</strong> of development (public 0.9.x from ~2016–17, v1.0 Aug 2021, v2.x now) by a <strong>very small core team (single-digit developers)</strong>, led by Jason Dorie. Reaching <em>full</em> parity is a multi-year effort; reaching a <em>credible, better-in-some-ways</em> GRBL product is not. (<a href="https://lightburnsoftware.com/blogs/news/lightburn-1-0-released-insert-party-noises">LightBurn 1.0</a>)</p>
+<p><strong>Straightforward in a browser (Phase 1):</strong><br>
+Vector editing, node editing, boolean ops, weld, <strong>offset/kerf</strong> (Clipper2), text/fonts (opentype.js; SHX single-line needs custom parsing), layers &amp; cut settings, material library, art library, material-test grid, <strong>print-and-cut</strong> (a 2-point similarity transform — simple linear algebra), cut-order optimization (TSP heuristics). These are UI/state/geometry problems the web handles well.</p>
+<p><strong>Hard / heavy:</strong></p>
+<ul>
+<li><strong>Camera alignment + fisheye lens correction</strong> — the single hardest subsystem. It's a classic OpenCV pipeline: AprilTag/marker detection across ~9 captures, distortion-coefficient solving to sub-pixel error (&lt;0.5px), undistort, then homography to overlay the live bed. In a browser that means <strong>OpenCV.js (WASM)</strong> + <code>getUserMedia</code> + per-frame WASM/GPU processing. Feasible, but budget for it. (<a href="https://docs.lightburnsoftware.com/latest/Reference/CalibrateCameraLens/">LightBurn camera calibration</a>)</li>
+<li><strong>Image engraving/dithering at scale</strong> — LightBurn ships ~10 modes (Floyd–Steinberg, Jarvis, Stucki, Atkinson, ordered, newsprint, halftone with variable cell/angle, sketch/edge-detect, grayscale/3D). Error diffusion is inherently sequential and slow in JS → <strong>needs WASM or WebGL</strong> for interactive speed. (<a href="https://docs.lightburnsoftware.com/UI/CutSettings/CutSettings-Image.html">LightBurn image settings</a>)</li>
+<li><strong>Real-time device control across three proprietary protocols</strong> — covered in §3–4; in aggregate the largest and riskiest bucket.</li>
+</ul>
+<hr>
+<h2 id="7-legal-ip-read-general-information-not-legal-advice">7. Legal / IP read (general information, not legal advice)</h2>
+<ul>
+<li><strong>Building a competing laser-control app is legal in principle.</strong> Functionality, protocols, and ideas aren't copyrightable — only specific expression (code, icons, UI art). Use <strong>clean-room</strong> discipline: copy no source, no verbatim UI art, no material-library data. (<a href="https://en.wikipedia.org/wiki/Clean_room_design">Clean room design</a>)</li>
+<li><strong>Reverse-engineering the <em>machine</em> protocols (Ruida, EZCAD) for interoperability is well-supported</strong> by <em>Sega v. Accolade</em> and <em>Sony v. Connectix</em> (intermediate copying for interoperability = fair use). MeerK40t and galvoplotter already did this openly, in this exact domain. Reverse-engineering the <em>machine</em> protocol (not LightBurn's app) also sidesteps LightBurn's EULA entirely. (<a href="https://en.wikipedia.org/wiki/Sega_v._Accolade">Sega v. Accolade</a>)</li>
+<li><strong>Risks to manage:</strong> DMCA §1201 has an interoperability exemption (§1201(f)) but it <strong>does not cover circumventing encryption</strong> — if any target controller uses encrypted handshakes/code-signing, risk rises. Don't touch the <strong>"LIGHTBURN" registered trademark</strong> (USPTO Reg. #6750777) or its dragon logo; "compatible with" nominative references are lower-risk. Do a formal <strong>USPTO patent clearance</strong> search before committing — none surfaced, but that gap should be closed. (<a href="https://www.eff.org/issues/coders/reverse-engineering-faq">EFF reverse-engineering FAQ</a>; <a href="https://uspto.report/TM/90676728">USPTO TM record</a>)</li>
+</ul>
+<hr>
+<h2 id="8-market-commercial-viability">8. Market &amp; commercial viability</h2>
+<ul>
+<li><strong>Market is large and growing double-digits.</strong> Desktop laser engraver market est. <strong>~$1.15B (2024) → ~$3.02B by 2033 (~11% CAGR)</strong>; ~62% of users are home/hobbyist. Figures are vendor-report estimates with wide variance. (<a href="https://researchintelo.com/report/desktop-laser-engraver-market/amp">ResearchIntelo</a>)</li>
+<li><strong>Monetizable installed base is real:</strong> xTool alone reported <strong>~$340M+ revenue in 2024</strong> and <strong>405,000+ machines connected since 2021</strong>, filing for a HK IPO. (<a href="https://en.wikipedia.org/wiki/XTool">xTool — Wikipedia</a>)</li>
+<li><strong>The seam you'd occupy:</strong> LightBurn is paid, desktop-only, and <strong>dropped Linux</strong> (v1.7 last Linux build) amid pricing backlash; Glowforge is web-based but <strong>cloud-only and unusable offline</strong>, a long-standing, documented user grievance worsened by cloud outages. <strong>MeerK40t</strong> proves the RE approach but is desktop Python — the polished, cross-platform, <strong>offline web</strong> niche is genuinely open. (<a href="https://hackaday.com/2024/07/31/lightburn-turns-back-the-clock-bails-on-linux-users/">Hackaday — LightBurn drops Linux</a>; <a href="https://community.glowforge.com/t/offline-standalone-application-for-glowforge/39074">Glowforge offline requests</a>)</li>
+<li><strong>Pricing anchor:</strong> LightBurn Core <strong>$99</strong> / Pro <strong>$199</strong>, perpetual license + <strong>$40/yr</strong> updates. A subscription or perpetual-plus-updates model at or slightly below this is defensible. (<a href="https://lightburnsoftware.com/blogs/news/new-lightburn-license-types-and-pricing-coming-oct-1-2024">LightBurn pricing</a>)</li>
+</ul>
+<p><strong>Contested premise flagged:</strong> the "LightBurn blocklisted Ortur/Atomstack diode lasers" story is <strong>unverified</strong> — the real 2024 controversies were the <strong>Linux drop</strong> and <strong>price increases</strong>. Don't build positioning on the blocklist claim.</p>
+<hr>
+<h2 id="9-recommended-stack-phased-roadmap">9. Recommended stack &amp; phased roadmap</h2>
+<p><strong>Stack:</strong> React/TypeScript UI · geometry core in <strong>WASM</strong> (Clipper2 for boolean/offset/kerf, potrace/VTracer for raster import, custom dithering) running in <strong>Web Workers</strong> · <strong>WebGL/WebGPU on OffscreenCanvas</strong> for rendering · <strong>OPFS</strong> for project blobs + <strong>IndexedDB</strong> for metadata · <strong>service worker</strong> app-shell caching for offline · <strong>Web Serial</strong> for GRBL · a signed, auto-updating <strong>native local agent</strong> (localhost WebSocket bridge, Win/Mac/Linux) for Ruida/galvo.</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Scope</th>
+<th>Hardware path</th>
+<th>Est. effort*</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1 — MVP</strong></td>
+<td>Design/CAM core, layers/cut settings, image dithering, GRBL streaming + jog, offline PWA</td>
+<td>Web Serial (Chromium desktop)</td>
+<td>2–3 devs, ~6–9 months</td>
+</tr>
+<tr>
+<td><strong>2 — Pro CO2</strong></td>
+<td>Native local agent; Ruida over UDP; camera alignment (OpenCV.js)</td>
+<td>Agent bridge</td>
+<td>+2–3 devs, ~6–9 months</td>
+</tr>
+<tr>
+<td><strong>3 — Galvo/fiber</strong></td>
+<td>EZCAD2/BJJCZ via agent (WebUSB fallback); rotary; advanced dithering</td>
+<td>Agent bridge / WebUSB</td>
+<td>+6+ months</td>
+</tr>
+<tr>
+<td><strong>Ongoing</strong></td>
+<td>Parity polish (material test, art library, print-and-cut refinements)</td>
+<td>—</td>
+<td>continuous</td>
+</tr>
+</tbody>
+</table>
+<p><em>Rough, given LightBurn reached today's state with a single-digit team over ~8 years. A focused GRBL competitor is a fraction of that; </em><em>full</em>* parity is a multi-year commitment.</p>
+<p><strong>Top blockers, ranked:</strong><br>
+1. <strong>No raw UDP in browsers</strong> → native agent is mandatory for Ruida Ethernet. Architect for it from day one.<br>
+2. <strong>Chromium-only</strong> (no Safari/iOS, shaky Firefox) → narrows TAM; must be messaged clearly.<br>
+3. <strong>Camera lens correction</strong> → hardest single feature; OpenCV.js in WASM.<br>
+4. <strong>Robust in-browser real-time streaming</strong> → hand-rolled character-counting + reconnection; no library does it for you.<br>
+5. <strong>Driver-claim battles</strong> (WebUSB vs kernel serial/FTDI; Zadig/WinUSB) for USB Ruida/galvo → another reason the agent wins.</p>
+<hr>
+<h2 id="10-bottom-line">10. Bottom line</h2>
+<p>Build it — but build it as <strong>"an offline-first web app with a small native companion,"</strong> not "browser-only." The design/CAM engine and GRBL control run beautifully in a Chromium PWA and slot into a real, unoccupied market seam (cross-platform + offline). The professional DSP/galvo tiers require a native helper — which is exactly what LightBurn already does — so that requirement is a known, financeable cost, not a surprise. The two genuine watch-items are the Chromium-only reach and the camera-alignment subsystem; everything else is precedented and tractable.</p>
+<hr>
+<h3 id="key-uncertainties-carried-forward">Key uncertainties carried forward</h3>
+<ul>
+<li>Firefox Web Serial "support" is nascent/contested; Android USB-serial is limited and new.</li>
+<li>WASM performance range (1.3×–2.5× slower than native) is the reliable band; ignore single-blog "92% of native" claims.</li>
+<li>Market dollar figures are vendor estimates with wide variance; LightBurn's active-user count is not public.</li>
+<li>"LightBurn blocklisted cheap diode lasers" is <strong>unverified</strong> — real controversies were Linux + pricing.</li>
+<li>No LightBurn patents surfaced, but a formal USPTO clearance search was not performed.</li>
+</ul>
+    </main>
+    <div class="doc-foot">house-style · converted from 01-feasibility-study.md · self-contained · bin/md2html.py</div>
+  </div>
+</body>
+</html>

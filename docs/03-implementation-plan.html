@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IMPLEMENTATION_PLAN.md — LaserKerf (Claude Code / Fable 5 execution backlog)</title>
+<style>
+  :root{
+    /* === Real tokens, verbatim from apps/web/src/styles.css :root === */
+    --bg:#0b0f14;
+    --panel:#131a22;
+    --border:#223040;
+    --text:#e6edf3;
+    --muted:#8b98a5;
+    --accent:#f0653a;
+
+    /* === Recurring literal values used across styles.css (not declared as vars,
+           but consistent enough to be de-facto tokens) === */
+    --surface:#1a2430;      /* button / input / control fill */
+    --toolbar:#0f151c;      /* toolbar strip */
+    --canvas:#0b0e13;       /* editor canvas / console bg */
+    --accent-ink:#1a0d06;   /* text on accent (active toolbar btn) */
+    --accent-ink2:#10151c;  /* text on accent (CAM generate) */
+    --ok:#3fb950;           /* online / success */
+    --warn:#f5b942;         /* stale / warning */
+    --err:#ff6b6b;          /* error */
+
+    /* radii observed in the app */
+    --r-sm:3px; --r-md:4px; --r-lg:5px; --r-xl:6px; --r-brand:12px; --r-pill:999px;
+
+    --mono:ui-monospace, monospace;
+    --sans:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html{scrollbar-width:thin;scrollbar-color:var(--line) var(--ink)}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:var(--ink)}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px;border:2px solid var(--ink)}
+  html,body{margin:0;background:var(--ink);color:var(--text);
+    font-family:var(--sans);line-height:1.62;-webkit-font-smoothing:antialiased}
+  body{background:radial-gradient(760px 300px at 50% -140px,rgba(227,165,82,.07),transparent 70%),var(--ink);
+    padding:26px 18px 80px;font-size:14.5px}
+  .wrap{max-width:800px;margin:0 auto}
+  .doc-mast{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+    border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:22px}
+  .doc-mast .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--faint)}
+  .doc-mast .eyebrow b{color:var(--brass)}
+  .doc-mast .src{font-family:var(--mono);font-size:10.5px;color:var(--faint)}
+  main h1,main h2,main h3,main h4{font-weight:800;letter-spacing:-.01em;line-height:1.25;color:var(--text)}
+  main h1{font-size:26px;margin:.2em 0 .5em}
+  main h2{font-size:20px;margin:1.7em 0 .5em;border-top:1px solid var(--line);padding-top:.8em}
+  main h3{font-size:16px;margin:1.4em 0 .4em}
+  main h4{font-size:13px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  main p{margin:.7em 0;color:var(--text)}
+  main a{color:var(--brass);text-decoration:none}
+  main a:hover{text-decoration:underline}
+  main strong{color:#fff}
+  main ul,main ol{margin:.6em 0;padding-left:1.4em}
+  main li{margin:.28em 0}
+  main li::marker{color:var(--faint)}
+  main code{font-family:var(--mono);font-size:.86em;color:#C9CEDF;background:var(--ink2);
+    padding:1px 5px;border-radius:4px}
+  main pre{background:var(--ink2);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:13px 15px;overflow:auto;line-height:1.5}
+  main pre code{background:none;padding:0;color:#C9CEDF;font-size:12px}
+  main blockquote{margin:1em 0;border-left:3px solid var(--brass-dim);background:var(--ink2);
+    border-radius:0 var(--r-md) var(--r-md) 0;padding:2px 16px;color:var(--muted)}
+  main table{border-collapse:collapse;width:100%;margin:1em 0;font-size:13px;display:block;overflow-x:auto}
+  main th,main td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  main th{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  main tr:hover td{background:var(--ink2)}
+  main hr{border:none;border-top:1px solid var(--line);margin:1.8em 0}
+  main img{max-width:100%;border-radius:var(--r-md)}
+  main input[type=checkbox]{accent-color:var(--brass);margin-right:6px}
+  .doc-foot{margin-top:44px;border-top:1px solid var(--line);padding-top:14px;
+    font-family:var(--mono);font-size:10px;color:var(--faint)}
+
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="doc-mast">
+      <span class="eyebrow"><b>▸</b> IMPLEMENTATION_PLAN.md — LaserKerf (Claude Code / Fable 5 execution backlog)</span>
+      <span class="src">03-implementation-plan.md</span>
+    </div>
+    <main>
+<h1 id="implementation_planmd-laserkerf-claude-code-fable-5-execution-backlog">IMPLEMENTATION_PLAN.md — LaserKerf (Claude Code / Fable 5 execution backlog)</h1>
+<p>This is the executable task backlog. It decomposes <strong>every</strong> feature from <code>development-plan.md</code> (phases M0–M9) and <code>browser-lightburn-clone-feasibility.md</code> (constraints &amp; feature list) into discrete task cards sized for a single Claude Code session. Conventions and invariants live in <code>CLAUDE.md</code> — read it first.</p>
+<hr>
+<h2 id="how-to-run-this-plan-with-claude-code-fable-5">How to run this plan with Claude Code (Fable 5)</h2>
+<p><strong>Loop, one card per session:</strong><br>
+1. <code>/clear</code> to start clean.<br>
+2. Paste the card (or say: <em>"Execute task M1-T03 from IMPLEMENTATION_PLAN.md. Read CLAUDE.md and the Refs first."</em>).<br>
+3. Claude reads <code>CLAUDE.md</code>, the card's <strong>Refs</strong> (line/section pointers into the two docs), and the listed <strong>Files</strong>.<br>
+4. Claude implements + writes tests, then runs the card's <strong>Verify</strong> commands.<br>
+5. Claude checks the card's <strong>Acceptance</strong> boxes, updates the <code>[ ]</code>→<code>[x]</code> status here, commits with the task ID in the message.</p>
+<p><strong>Parallelism:</strong> cards marked <code>∥</code> within a milestone have no ordering dependency and can be run by parallel subagents/worktrees. Cards list explicit <strong>Deps</strong>.</p>
+<p><strong>Prompt template (paste-ready for any card):</strong></p>
+<pre><code>Execute &lt;TASK-ID&gt; from IMPLEMENTATION_PLAN.md.
+First read CLAUDE.md and the Refs cited in the card.
+Honor all architecture invariants. Write tests. Run the Verify commands.
+Do not touch machine-output golden fixtures without noting it in the commit body.
+Stop when every Acceptance box passes; then mark the card [x] and commit as &quot;&lt;TASK-ID&gt;: &lt;summary&gt;&quot;.
+</code></pre>
+<p><strong>Card fields:</strong> <em>Goal · Deps · Refs · Files · Notes · Accept · Verify.</em> Refs cite the two source docs by section (F§ = feasibility doc, D§ = dev-plan doc).</p>
+<p><strong>Global exit gate per milestone:</strong> the milestone's exit criteria in <code>development-plan.md §5</code> must hold, and <code>pnpm turbo lint typecheck test</code> + relevant golden/offline/conformance suites are green.</p>
+<hr>
+<h2 id="milestone-m0-foundations-blocks-everything">Milestone M0 — Foundations (blocks everything)</h2>
+<ul>
+<li>[x] <strong>M0-T01 — Monorepo &amp; toolchain</strong> ∥</li>
+<li>Goal: pnpm + Turborepo monorepo with the exact layout in <code>CLAUDE.md</code>; TS strict, ESLint/Prettier, Vitest, Playwright, Rust workspace for <code>apps/agent</code>, Emscripten toolchain for <code>packages/geometry-wasm</code>.</li>
+<li>Deps: none. Refs: D§1.3, D§2, CLAUDE.md.</li>
+<li>Files: root <code>package.json</code>, <code>pnpm-workspace.yaml</code>, <code>turbo.json</code>, <code>tsconfig.base.json</code>, per-package scaffolds, CI stub.</li>
+<li>Accept: <code>pnpm install</code> clean; <code>pnpm turbo build lint typecheck test</code> runs (empty packages OK); Rust <code>cargo build</code> in <code>apps/agent</code> compiles a stub.</li>
+<li>
+<p>Verify: <code>pnpm install &amp;&amp; pnpm turbo build lint typecheck test</code>.</p>
+</li>
+<li>
+<p>[x] <strong>M0-T02 — PWA shell + offline service worker</strong></p>
+</li>
+<li>Goal: installable Vite React PWA; Workbox service worker precaches app shell + WASM; manifest triggers install on Chromium desktop.</li>
+<li>Deps: M0-T01. Refs: F§5 (offline), D§5 (full offline), CLAUDE.md invariant 3.</li>
+<li>Files: <code>apps/web/*</code>, manifest, SW registration, precache config.</li>
+<li>Accept: app installs as PWA; loads with network fully offline after first load; Lighthouse PWA installable.</li>
+<li>
+<p>Verify: <code>pnpm --filter web build &amp;&amp; pnpm e2e:offline</code>.</p>
+</li>
+<li>
+<p>[x] <strong>M0-T03 — Storage layer (OPFS blobs + IndexedDB meta) + crash-safe autosave</strong></p>
+</li>
+<li>Goal: <code>packages/fileformats</code> storage module: project blobs in OPFS, metadata in IndexedDB; <code>navigator.storage.persist()</code>; debounced autosave.</li>
+<li>Deps: M0-T01. Refs: F§5 (OPFS vs IDB, persist), D§4.7, D§5.</li>
+<li>Files: <code>packages/fileformats/storage/*</code>.</li>
+<li>Accept: 100MB blob write/read via OPFS; metadata query via IDB; persistence granted after PWA install; autosave restores after simulated crash.</li>
+<li>
+<p>Verify: <code>pnpm --filter fileformats test</code>.</p>
+</li>
+<li>
+<p>[x] <strong>M0-T04 — Device interface + fake device/simulator</strong> ∥</p>
+</li>
+<li>Goal: <code>packages/device-core</code> <code>Device</code> interface (<code>connect/disconnect/stream/jog/frame/home/status/stop</code>), transport registry, and a <code>FakeDevice</code> that simulates buffer + status for headless CAM/UI dev.</li>
+<li>Deps: M0-T01. Refs: D§1.2 (abstraction rule), D§4.1, CLAUDE.md invariant 2.</li>
+<li>Files: <code>packages/device-core/*</code>.</li>
+<li>Accept: FakeDevice streams a G-code job, reports progress/status, honors stop/hold; zero DOM/UI deps.</li>
+<li>
+<p>Verify: <code>pnpm --filter device-core test</code>.</p>
+</li>
+<li>
+<p>[x] <strong>M0-T05 — WASM build pipeline (Clipper2 smoke)</strong></p>
+</li>
+<li>Goal: <code>packages/geometry-wasm</code> builds Clipper2 C++→WASM; TS typed worker API via Comlink; round-trips a boolean op off-main-thread.</li>
+<li>Deps: M0-T01. Refs: F§5 (Clipper2-WASM), D§2, D§5.</li>
+<li>Files: <code>packages/geometry-wasm/*</code>, worker harness.</li>
+<li>Accept: union/difference of two polygons returns correct geometry from a Worker; build reproducible in CI.</li>
+<li>
+<p>Verify: <code>pnpm --filter geometry-wasm build test</code>.</p>
+</li>
+<li>
+<p>[x] <strong>M0-T06 — Test harnesses: golden-output + offline + CI</strong></p>
+</li>
+<li>Goal: golden-fixture harness (design+settings→machine code byte/tolerance match), offline Playwright suite, protocol-conformance scaffold, coordinate/units matrix scaffold; wire all into CI.</li>
+<li>Deps: M0-T02..T05. Refs: D§4 (foundations), D§8 (testing).</li>
+<li>Files: <code>e2e/*</code>, <code>tools/golden/*</code>, CI workflow.</li>
+<li>Accept: sample golden passes; <code>pnpm e2e:offline</code> green; CI runs lint/typecheck/test/golden/offline on PR.</li>
+<li>Verify: <code>pnpm turbo test &amp;&amp; pnpm e2e:offline</code>.</li>
+</ul>
+<p><strong>M0 exit:</strong> empty app installs, runs offline, saves/loads <code>.laserkerf</code>, FakeDevice streams to simulator, CI green incl. offline. (D§5 M0)</p>
+<hr>
+<h2 id="milestone-m1-design-vector-engine">Milestone M1 — Design &amp; vector engine</h2>
+<ul>
+<li>[x] <strong>M1-T01 — Canvas editor core + scene model</strong> — WebGL2 renderer on OffscreenCanvas (worker), pan/zoom, selection, move/scale/rotate, align/distribute, grouping, snapping/guides, rulers, units (mm/inch). Deps: M0-T02,T05. Refs: F§6 (straightforward), D§5 M1, D§2 render. Accept: 5k-path scene stays 60fps; transforms + align/distribute correct; snapping works. Verify: <code>pnpm --filter web test &amp;&amp; perf bench</code>.</li>
+<li>[x] <strong>M1-T02 — Primitive tools</strong> ∥ — rectangle, ellipse, polygon, line, bezier/curve creation with numeric entry. Deps: M1-T01. Refs: D§5 M1. Accept: each primitive creates exact geometry; editable params. Verify: unit tests.</li>
+<li>[x] <strong>M1-T03 — Node editing</strong> — full node editor: add/delete/move nodes, convert segment types (line/curve), handle manipulation, path open/close. Deps: M1-T01. Refs: F§6 (node editing), D§7. Accept: all segment types editable; matches LightBurn node-edit behaviors. Verify: unit + visual tests.</li>
+<li>[x] <strong>M1-T04 — Boolean ops + weld</strong> ∥ — union/difference/intersection (two shapes) and weld (N closed shapes) via Clipper2-WASM. Deps: M0-T05, M1-T01. Refs: F§5, F§6, D§7. Accept: golden geometry match for each op; weld joins N outlines. Verify: <code>pnpm --filter geometry-wasm test</code>.</li>
+<li>[x] <strong>M1-T05 — Offset / kerf</strong> ∥ — polygon offset (inside/outside, open &amp; closed), remembers last settings. Deps: M0-T05. Refs: F§5 (kerf solved), D§6 checklist. Accept: offset distances exact vs golden; open-path offset correct. Verify: golden tests.</li>
+<li>[x] <strong>M1-T06 — Text &amp; fonts (TrueType/OpenType)</strong> — text tool with system/uploaded fonts via opentype.js. Deps: M1-T01. Refs: F§6 (fonts), D§7. Accept: text renders and converts to paths; kerning/spacing controls. Verify: unit + visual. <strong>Landed:</strong> <code>textToSubPaths</code>/<code>textToPathShape</code> (glyph outlines → scene paths, y-flip, kerning, letter-spacing, multi-line); <code>parseFont</code>; store <code>addText</code> bakes centred + undoable; Toolbar text/size controls + font loader (Local Font Access API → file-upload fallback). No default font is bundled — that is a product/licensing choice for the owner; users load a system or uploaded font. SHX split to M1-T06b.</li>
+<li>[ ] <strong>M1-T06b — SHX engraving fonts</strong> — single-line/stroke SHX font parser (AutoCAD shape bytecode) → paths. Deps: M1-T06. Refs: F§6 (🟡 SHX), D§7. Accept: representative <code>.shx</code> fonts render as single-line strokes. Verify: unit against real <code>.shx</code> fixtures. <strong>Note:</strong> deferred deliberately — SHX is a reverse-engineered binary format; building it needs real <code>.shx</code> sample files to validate against (per Gate-2: don't parse a binary format from memory with no reference).</li>
+<li>[x] <strong>M1-T07 — Layers panel + undo/redo</strong> ∥ — layer model, color-coded layers, visibility/lock, full undo/redo (command stack). Deps: M1-T01. Refs: D§5 M2 (layers), D§7. Accept: layer ops + undo/redo across all edits. Verify: unit tests.</li>
+<li>[x] <strong>M1-T08 — Vector import: SVG/DXF</strong> ∥ — importers normalizing to the scene model; preserve layers/units where present. Deps: M1-T01. Refs: F§6 (import ✅), D§5 M1. Accept: reference files import with correct geometry/scale. Verify: import golden fixtures. <strong>Landed:</strong> SVG (full path-data incl. arcs, transforms, viewBox→mm y-flip, colour→layer) + DXF (LINE/LWPOLYLINE+bulge/POLYLINE/CIRCLE/ARC/ELLIPSE, $INSUNITS scale). AI/PDF split to M1-T08b (below) — they need a PDF engine (pdf.js/pdfium), a separate risk to size + the offline invariant.</li>
+<li>[ ] <strong>M1-T08b — Vector import: AI/PDF</strong> ∥ — Adobe Illustrator (PDF-based) and PDF vector import via an embedded PDF engine. Deps: M1-T08. Refs: F§6, D§5 M1. Accept: reference AI/PDF import with correct geometry/scale; offline invariant stays green (engine precached, no network). Verify: import golden fixtures + <code>pnpm e2e:offline</code>.</li>
+<li>[x] <strong>M1-T09 — Raster import (PNG/JPG)</strong> ∥ — image placement, scaling, DPI awareness (feeds M6). Deps: M1-T01. Refs: D§5 M1. Accept: images import at correct physical size. Verify: unit. <strong>Landed:</strong> <code>ImageShape</code> (physical mm size, source data URL, px dims); PNG/JPEG header parser reads intrinsic size + DPI (pHYs / JFIF) → physical size on import; renders as a placeholder bounds box (pixels engraved in M6) and is skipped by <code>leafGeometries</code> so CAM never cuts it; stored inline in <code>.laserkerf</code>.</li>
+<li>[x] <strong>M1-T10 — LightBurn <code>.lbrn</code>/<code>.lbrn2</code> import</strong> — parse LightBurn XML → scene model (shapes, layers, cut settings mapping). Deps: M1-T07, M2-T01(cut settings map may land after; stub then complete). Refs: F§6 (🟡 lbrn import), D§7. Accept: representative <code>.lbrn</code> imports with shapes+layers; unmapped settings logged. Verify: import golden fixtures. <strong>Landed:</strong> CutSetting→layer (by index, named), Rect (centred)/Ellipse/Path/Group/Text-backup-path via XForm affine (y-up, no flip); VertList <code>c0/c1</code> handles + PrimList <code>L</code>/<code>B</code>/<code>LineClosed</code>; VertID/PrimID dedup-reference registry; unmapped types (Bitmap, …) reported. Validated against real <code>.lbrn2</code> files (45Deg/BusinessCard/Baseball → clean except raster <code>Bitmap</code>, which could route to M1-T09 <code>ImageShape</code> later). Committed test uses a synthetic fixture; run your own exports to confirm parity.</li>
+<li>[x] <strong>M1-T11 — <code>.laserkerf</code> format v1 (open, versioned)</strong> — zipped JSON + assets; save/load round-trip via storage layer; schema version + migration hook. Deps: M0-T03. Refs: D§1.2 (open format). Accept: full project round-trips losslessly; version field present. Verify: round-trip test.</li>
+</ul>
+<p><strong>M1 exit:</strong> user can draw, import, and edit a real project to LightBurn-comparable fidelity; boolean/offset match golden; node editor handles all segment types. (D§5 M1)</p>
+<hr>
+<h2 id="milestone-m2-cam-core-g-code">Milestone M2 — CAM core &amp; G-code</h2>
+<ul>
+<li>[x] <strong>M2-T01 — Layer cut modes: Line / Fill / Offset Fill / Fill+Line</strong> — implement the four modes incl. concentric offset fill and Fill+Line via sub-layers. Deps: M1-T04,T05,T07. Refs: F§6 (layer modes), D§5 M2. Accept: each mode produces correct toolpaths vs golden. Verify: golden.</li>
+<li>[x] <strong>M2-T02 — Per-layer cut settings + sub-layers + fill grouping</strong> ∥ — speed, min/max power, passes, interval, air assist, sub-layers, fill grouping (all-at-once/groups/individually). Deps: M2-T01. Refs: F§6, D§5 M2. Accept: settings drive output; fill grouping orders correctly. Verify: golden + unit.</li>
+<li>[x] <strong>M2-T03 — Cut-order optimization</strong> ∥ — TSP-style ordering, inner-before-outer, per-layer ordering, direction control. Deps: M2-T01. Refs: F§6 (TSP heuristics), D§5 M2. Accept: reduces travel vs naive; respects constraints; deterministic. Verify: golden + metric assertion.</li>
+<li>[x] <strong>M2-T04 — Material library</strong> ∥ — presets (speed/power/passes/interval) per material/machine; import/export; apply-to-layer. Deps: M2-T02. Refs: F§6, D§5 M2. Accept: library CRUD + apply; export/import round-trips. Verify: unit.</li>
+<li>[x] <strong>M2-T05 — Material test grid generator</strong> ∥ — parametric grid (default 10×10) varying power/speed/passes/interval; built-in diode/CO2 presets. Deps: M2-T02. Refs: F§6 (material test), D§5 M2. Accept: grid generates as designed; labels correct. Verify: golden geometry.</li>
+<li>[x] <strong>M2-T06 — Art library</strong> ∥ — reusable clip-art/shape storage, drag-in, categories. Deps: M1-T11, M0-T03. Refs: F§6 (art library), D§5 M2. Accept: store/retrieve/insert shapes; persists offline. Verify: unit.</li>
+<li>[x] <strong>M2-T07 — Coordinate/origin/optimization settings</strong> — job origin, machine origin, workspace transforms, units; optimization settings panel. Deps: M2-T01. Refs: D§4.6 (coordinate harness), D§5 M2. Accept: coordinate matrix (mm/inch × origins) passes. Verify: <code>coordinate matrix</code> suite.</li>
+<li>[x] <strong>M2-T08 — G-code generator + live simulation/preview</strong> — emit GRBL G-code from CAM; animated path preview (travel vs cut), time estimate. Deps: M2-T01,T02,T03,T07. Refs: F§6 (gcode ✅), D§5 M2. Accept: golden G-code match; simulator matches emitted order; time estimate within tolerance. Verify: <code>pnpm --filter fileformats test:golden</code>.</li>
+</ul>
+<p><strong>M2 exit:</strong> golden G-code matches; simulator accurate; material library + test grid usable end-to-end. QA regression suite live. (D§5 M2)</p>
+<hr>
+<h2 id="milestone-m3-grbl-real-time-control-mvp-ship">Milestone M3 — GRBL real-time control → MVP ship</h2>
+<ul>
+<li>[x] <strong>M3-T01 — Web Serial transport</strong> — <code>WebSerialTransport</code> implementing <code>Device</code>; port request (user gesture), persistent grant reconnection via <code>getPorts()</code>. Deps: M0-T04. Refs: F§3 (Web Serial, permission model), D§5 M3. Accept: connect/disconnect real GRBL board; reconnect without re-pick. Verify: HIL smoke. <strong>Landed:</strong> <code>WebSerialTransport implements Transport</code> (byte pipe over a <code>SerialPort</code>: open at baud, read-pump → subscribers, write, cancel/close); <code>requestSerialPort</code> (user-gesture <code>requestPort</code>) + <code>listSerialPorts</code> (persistent-grant <code>getPorts</code> reconnect) + <code>isWebSerialSupported</code>; self-registers as <code>webserial</code> in the transport registry. Unit-tested with a mock port over real web streams (open/pump/write/close/registry). <strong>HIL pending (yours):</strong> connect/disconnect a real GRBL board + reconnect without re-pick — needs hardware. The GRBL streaming/real-time logic that turns this pipe into a <code>Device</code> lands in M3-T02–T06.</li>
+<li>[x] <strong>M3-T02 — Character-counting streaming</strong> — implement GRBL char-counting protocol; keep planner full without RX overflow. Deps: M3-T01. Refs: F§3 (char-counting), D§5 M3, F§ streaming risk. Accept: multi-hour engrave with no buffer stall; throughput matches native in bench. Verify: HIL soak. <strong>Landed:</strong> pure GRBL parser (<code>protocols/grbl/parse.ts</code>: ok/error/alarm/status/welcome, realtime bytes, line splitter) + <code>GrblDevice implements Device</code> (<code>grbl-device.ts</code>) streaming via char-counting — sends lines while in-flight bytes fit the ~127B RX buffer, frees on each ok, faults on error/alarm, serialises writes onto one chain (single serial writer). Unit-tested with a mock GRBL that models the RX buffer: 30-line stream completes with peak in-flight ≤ buffer and &gt; half (filled, no overflow), empty-job, error/alarm→faulted, hold/resume (no progress while held), status→position, stop→soft-reset. Transport-agnostic + DOM-free, so it drops into the streaming Web Worker. <strong>HIL pending (yours):</strong> multi-hour soak on a real board; the Worker wrapper + connect/stream UI wire up with M3-T03/T04.</li>
+<li>[x] <strong>M3-T03 — Real-time controls</strong> — jog (<code>$J=</code>), feed-hold <code>!</code>, resume <code>~</code>, soft-reset <code>0x18</code>, status <code>?</code> polling; all via real-time bytes bypassing line buffer. Deps: M3-T02. Refs: F§3 (real-time bytes), D§5 M3. Accept: jog latency indistinguishable from native (blind test); hold/resume/reset reliable. Verify: HIL. <strong>Landed:</strong> jog (<code>$J=G91</code>), <code>cancelJog</code> (realtime <code>0x85</code>), hold/resume/soft-reset (realtime <code>!</code>/<code>~</code>/<code>0x18</code>), and <code>?</code> status polling (<code>startStatusPoll</code>/<code>stopStatusPoll</code>, injectable timer). Real-time bytes go straight onto the write chain, so they reach the controller during a stream without waiting for the line buffer to drain (tested: <code>!</code> sent mid-stream with lines still pending; poll emits <code>?</code> per tick; jog-cancel byte sent). <strong>HIL pending (yours):</strong> blind jog-latency + hold/resume/reset reliability on a real board.</li>
+<li>[x] <strong>M3-T04 — Console + alarm/error handling + reconnection</strong> ∥ — raw console, GRBL alarm/error decoding, auto-reconnect, safe state recovery. Deps: M3-T02. Refs: D§5 M3. Accept: alarms surfaced with human text; reconnect resumes cleanly. Verify: fault-injection tests. <strong>Landed:</strong> GRBL 1.1 error (1–38) + alarm (1–10) code→text tables (<code>errorMessage</code>/<code>alarmMessage</code>); faults now carry human text (e.g. <code>error:20 — Unsupported G/M command</code>); raw TX/RX console stream (<code>onConsole</code>, real-time bytes shown as <code>?</code>/<code>!</code>/<code>~</code>/<code>^X</code>); <code>reconnect()</code> re-attaches to the transport and restores a clean idle state (auto-detecting an unplug is app-level via <code>listSerialPorts</code>). Fault-injection tests: error/alarm human text, TX/RX console capture, reconnect-then-stream. <strong>HIL pending (yours):</strong> clean resume after a real mid-job unplug.</li>
+<li>[x] <strong>M3-T05 — Framing/outline + homing</strong> ∥ — frame job bounds, run outline, <code>$H</code> homing, work-origin set. Deps: M3-T03. Refs: F§6 (jog/frame/home ✅), D§5 M3. Accept: frame traces true bounds; homing + origin correct. Verify: HIL. <strong>Landed:</strong> <code>frame(bounds)</code> traces the true min→max→start box as laser-off G0 rapids (no <code>S</code> word) for positioning, or a visible low-power outline (<code>M3 S&lt;power&gt;</code> … <code>M5</code> at feed) when <code>power</code> is given; <code>home()</code> sends <code>$H</code>; <code>setWorkOrigin()</code> sends <code>G10 L20 P0 X0 Y0</code>. Tests assert exact framing/outline/home/origin G-code. <strong>HIL pending (yours):</strong> frame traces true bounds + homing/origin correct on a real board.</li>
+<li>
+<p>[x] <strong>M3-T06 — GRBL device profiles</strong> ∥ — GRBL, GRBL-M3, GRBL-LPC, Smoothieware, Marlin, Cohesion3D profiles (dialect quirks, $-settings). Deps: M3-T02. Refs: F§ (LightBurn controllers), D§5 M3. Accept: each profile connects + streams on emulator/HIL; dialect diffs handled. Verify: conformance per profile. <strong>Landed:</strong> <code>DeviceProfile</code> + <code>PROFILES</code> (all six) capturing the streaming-relevant dialect diffs — RX buffer size, flow control (GRBL char-counting vs Marlin ping-pong), laser command (<code>M4</code> dynamic vs <code>M3</code> constant), and status mechanism (real-time <code>?</code> vs polled <code>M114</code>). <code>GrblDevice</code> reads the profile: <code>pump</code> throttles per flow-control, <code>requestStatus</code> uses <code>?</code>/<code>M114</code>, and Marlin <code>M114</code> position reports parse. Conformance test streams a 30-line job through an emulator for <strong>each</strong> profile (ping-pong ≤ 1 in flight; char-counting pipelines within the buffer, never overflows) + Marlin M114 position + laser/baud metadata. <strong>HIL pending (yours):</strong> connect+stream each on real/emulated boards.</p>
+</li>
+<li>
+<p>[x] <strong>M3-UI — Machine-control UI + device worker</strong> — the app surface that drives the machine: <code>MachinePanel</code> (Connect Simulator | GRBL-by-profile, live state/position, Run/Hold/Resume/Stop with progress, jog pad + step/feed, Frame/Home/Set-origin, raw TX/RX console + command entry). Store <code>MachineController</code> slice (connect/run/jog/frame/home/origin/hold/resume/stop/console) driven through a controller interface with two impls: an offline <strong>Simulator</strong> (<code>FakeDevice</code>) and <strong>GRBL over Web Serial</strong> hosted in a Comlink <strong>device worker</strong> (streaming off the main thread — invariant 4; port granted on the main thread by user gesture, opened in the worker via <code>getPorts()</code>). Verified: web unit tests drive the full UI + store through the Simulator (connect/jog/disconnect, stream-with-progress, console, control forwarding); <code>pnpm --filter web build</code> bundles the device worker + PWA precache. <strong>HIL pending (yours):</strong> the Web Serial + worker path on a real GRBL board.</p>
+</li>
+</ul>
+<p><strong>M3 exit:</strong> reliable multi-hour engrave on real GRBL; jog latency native-comparable; HIL soak passes. <strong>Ship GRBL product (paid beta).</strong> (D§5 M3) — software complete; <strong>awaiting your GRBL hardware test.</strong></p>
+<hr>
+<h2 id="milestone-m4-agent-ruida-dsp">Milestone M4 — Agent + Ruida DSP</h2>
+<ul>
+<li>[ ] <strong>M4-T01 — Agent scaffold (Rust): localhost WSS + token pairing + auto-update + signing</strong> — tokio/tungstenite WSS on 127.0.0.1, origin-locked, token-paired to the App; code-signed installers (Win/macOS/Linux); auto-updater; version negotiation with App. Deps: M0-T01. Refs: F§4 (agent unavoidable), D§1.1, D§4.1, CLAUDE.md invariant 6. Accept: App pairs to Agent; signed installers build in CI; old-Agent/new-App degrades gracefully; security review checklist passed. Verify: <code>pnpm --filter agent verify</code>.</li>
+<li>[ ] <strong>M4-T02 — <code>AgentTransport</code> in web</strong> — <code>Device</code> transport speaking to the Agent over WSS; "install companion" flow when absent; capability discovery. Deps: M4-T01, M0-T04. Refs: D§1.2, F§4. Accept: DSP device reached only via Agent; GRBL still works agent-less. Verify: integration test with Agent stub.</li>
+<li>[ ] <strong>M4-T03 — Ruida codec (checksum + swizzle + ACK/resend)</strong> — implement Ruida framing: 2-byte checksum, high-bit command bytes / 14-/35-bit ints, per-model swizzle table, 0xCC/0xCF ACK with resend; UDP 50200 send / 40200 recv (in Agent). Deps: M4-T01. Refs: F§4 (Ruida protocol, ports, swizzle), D§4 (protocols). Accept: conformance vs MeerK40t emulator + captured real traffic; checksum/swizzle exact. Verify: <code>pnpm --filter protocols test:conformance</code> + Agent Rust tests.</li>
+<li>[ ] <strong>M4-T04 — <code>.rd</code> export + direct send</strong> ∥ — generate Ruida <code>.rd</code> job files and stream to controller via Agent. Deps: M4-T03, M2-T08. Refs: F§6 (.rd export 🟡), D§6 checklist. Accept: <code>.rd</code> cuts a real job on physical Ruida; file also loadable via USB stick. Verify: HIL Ruida.</li>
+<li>[ ] <strong>M4-T05 — DSP device profiles: Ruida, Trocen, TopWisdom</strong> ∥ — profiles + settings for the three DSP families. Deps: M4-T03. Refs: F§ (DSP controllers), D§5 M4. Accept: Ruida full; Trocen/TopWisdom connect + basic job (flag partial where RE thin). Verify: conformance/HIL.</li>
+<li>[ ] <strong>M4-T06 — DSP origin/job settings + DSP rotary</strong> ∥ — DSP-specific origins, job framing, and chuck/roller rotary for DSP. Deps: M4-T04. Refs: F§6 (rotary), D§5 M4, D§ rotary. Accept: origin modes correct on HIL; rotary scales circumference correctly. Verify: HIL.</li>
+</ul>
+<p><strong>M4 exit:</strong> cut a real job on a physical Ruida via the Agent; conformance suite passes; one-click signed Agent install/pair/update. (D§5 M4)</p>
+<hr>
+<h2 id="milestone-m5-camera-alignment-lens-correction">Milestone M5 — Camera alignment &amp; lens correction</h2>
+<ul>
+<li>[ ] <strong>M5-T01 — Camera capture (<code>getUserMedia</code>)</strong> ∥ — device selection, live preview, frame grab pipeline into workers. Deps: M0-T02. Refs: F§6 (camera hardest), D§5 M5. Accept: stable capture from a real USB camera. Verify: manual + integration.</li>
+<li>[ ] <strong>M5-T02 — Lens calibration wizard (OpenCV.js/WASM)</strong> — AprilTag/circle-grid detection across ~9 guided captures; solve intrinsic + distortion coeffs to &lt;0.5px reprojection; store per-camera profile. Deps: M5-T01, <code>packages/cv</code>. Refs: F§6 §3 (calibration pipeline, sub-pixel), D§5 M5. Accept: reprojection error &lt;0.5px on a real fisheye; reproducible across sessions. Verify: CV fixture tests + real-camera check.</li>
+<li>[ ] <strong>M5-T03 — Camera alignment / homography overlay</strong> — undistort + homography to overlay live bed onto workspace; alignment target workflow. Deps: M5-T02. Refs: F§6 §3, D§5 M5. Accept: place-image-on-bed alignment within LightBurn tolerance on real bed. Verify: HIL + measured error.</li>
+<li>[ ] <strong>M5-T04 — Official-camera presets + capture-to-trace</strong> ∥ — preset distortion profiles (skip manual cal); capture→VTracer trace path. Deps: M5-T03, M1-T08. Refs: F§6 §3, D§5 M5. Accept: preset cameras skip calibration; capture traces to vectors. Verify: integration.</li>
+</ul>
+<p><strong>M5 exit:</strong> end-to-end place-image-and-cut with alignment within tolerance on real camera+bed; calibration reproducible. (D§5 M5)</p>
+<hr>
+<h2 id="milestone-m6-image-engraving-parity">Milestone M6 — Image engraving parity</h2>
+<ul>
+<li>[ ] <strong>M6-T01 — Dither engine (Rust→WASM): all modes</strong> — Threshold, Ordered, Atkinson, Floyd–Steinberg ("Dither"), Stucki, Jarvis, Newsprint, Halftone (variable cell + angle), Sketch (edge detect), Grayscale. Sequential error-diffusion in WASM/worker for interactivity. Deps: M0-T05, M1-T09. Refs: F§6 (10 modes list), D§5 M6. Accept: each mode visually matches LightBurn output side-by-side; high-res re-dither stays responsive. Verify: visual-regression fixtures + perf bench.</li>
+<li>[ ] <strong>M6-T02 — Image mode options</strong> ∥ — pass-through, negative, bi-directional fill, overscan, DPI/line-interval, scan angle, ramp (rubber stamp), Z-offset. Deps: M6-T01, M2-T02. Refs: F§6 (image options), D§5 M6. Accept: each option affects output correctly vs golden. Verify: golden.</li>
+<li>[ ] <strong>M6-T03 — Grayscale / 3D depth engraving</strong> — power-modulated grayscale mapping; tie to device power model (CO2). Deps: M6-T01, M3-T02/M4-T04. Refs: F§6 (🔴 grayscale/3D), D§5 M6. Accept: depth map → power modulation matches reference on HIL; documented accuracy limits. Verify: HIL + golden power curve.</li>
+</ul>
+<p><strong>M6 exit:</strong> side-by-side engraves match LightBurn per mode; interactive re-dither responsive. (D§5 M6)</p>
+<hr>
+<h2 id="milestone-m7-galvo-fiber">Milestone M7 — Galvo / fiber</h2>
+<ul>
+<li>[ ] <strong>M7-T01 — Agent USB path for BJJCZ/EZCAD2 (libusb/WinUSB)</strong> — VID 0x9588/PID 0x9899; BULK command + status-poll endpoints; anti-clone dongle handling (skippable); 12-byte commands in 256-bunches, NOP-padded. Deps: M4-T01. Refs: F§4 (galvo protocol, endpoints), D§5 M7. Accept: conformance vs captured EZCAD2 traffic; marks on real board via Agent. Verify: <code>protocols test:conformance</code> + HIL galvo.</li>
+<li>[ ] <strong>M7-T02 — WebUSB fallback (where OS permits)</strong> ∥ — Chromium WebUSB direct path when no kernel driver holds the interface; graceful fall-through to Agent; WinUSB/Zadig guidance in onboarding. Deps: M7-T01. Refs: F§4 (WebUSB limits, Zadig), D§5 M7. Accept: WebUSB path works on a clean WinUSB setup; auto-detects and routes. Verify: integration.</li>
+<li>[ ] <strong>M7-T03 — Galvo job encoder</strong> — vector/fill/image → galvo mark commands via the codec. Deps: M7-T01, M2-T08. Refs: F§6 (galvo job export 🟡), D§5 M7. Accept: encoded job marks correctly on HIL. Verify: golden + HIL.</li>
+<li>[ ] <strong>M7-T04 — Galvo settings + rotary + presets</strong> ∥ — lens/field size, wobble, marking passes; galvo rotary; galvo material presets. Deps: M7-T03. Refs: F§6 (galvo rotary), D§5 M7. Accept: field-size calibration correct; wobble/passes affect output; rotary verified. Verify: HIL.</li>
+</ul>
+<p><strong>M7 exit:</strong> mark a real fiber/CO2 galvo job via the Agent; conformance vs EZCAD2 captures; driver guidance integrated. (D§5 M7)</p>
+<hr>
+<h2 id="milestone-m8-print-and-cut-rotary-polish-advanced-workflows">Milestone M8 — Print-and-cut, rotary polish, advanced workflows</h2>
+<ul>
+<li>[ ] <strong>M8-T01 — Print-and-cut registration</strong> — 2-point similarity transform (translate/rotate/scale) from two target marks; optional auto-scale; applies across GRBL/DSP/galvo. Deps: M2-T07, M3-T05, M4-T06. Refs: F§6 (print-and-cut ✅), D§5 M8. Accept: round-trips a pre-printed sheet within registration tolerance. Verify: HIL measured.</li>
+<li>[ ] <strong>M8-T02 — Rotary refinements (chuck/roller × device class)</strong> ∥ — unify chuck vs roller across GRBL/DSP/galvo; per-object diameter entry (chuck) and one-time roller measure. Deps: M4-T06, M7-T04. Refs: F§6 (rotary 🟡), D§5 M8. Accept: circumference scaling correct per device class on HIL. Verify: HIL.</li>
+<li>[ ] <strong>M8-T03 — Job restart/continue + tiling</strong> ∥ — resume halted jobs; second-pass alignment; tile jobs larger than bed. Deps: M8-T01. Refs: F§6 (restart/tiling ✅), D§5 M8. Accept: restart resumes from stop point; tiling aligns seams. Verify: HIL.</li>
+</ul>
+<p><strong>M8 exit:</strong> print-and-cut within tolerance; rotary verified on real hardware per device class. (D§5 M8)</p>
+<hr>
+<h2 id="milestone-m9-parity-hardening-ga">Milestone M9 — Parity hardening &amp; GA</h2>
+<ul>
+<li>[ ] <strong>M9-T01 — Controller quirks &amp; firmware variants</strong> ∥ — long-tail GRBL/DSP/galvo firmware variants and edge cases from beta telemetry/bug reports. Deps: M3/M4/M7 complete. Refs: D§5 M9, D§7 (long-tail). Accept: top reported variants supported; conformance expanded. Verify: expanded conformance.</li>
+<li>[ ] <strong>M9-T02 — Coordinate edge cases + units hardening</strong> ∥ — exhaustive origin/units/mirroring/negative-workspace cases. Deps: M2-T07. Refs: D§4.6, D§5 M9. Accept: full coordinate matrix green incl. edge cases. Verify: coordinate suite.</li>
+<li>[ ] <strong>M9-T03 — Performance pass (huge files + WebGPU renderer)</strong> ∥ — large-document perf; enable WebGPU renderer behind flag; OffscreenCanvas tuning. Deps: M1-T01. Refs: F§5 (WebGL/WebGPU), D§2, D§5 M9. Accept: defined large-file scene meets fps target; WebGPU path parity. Verify: perf bench.</li>
+<li>[ ] <strong>M9-T04 — Accessibility + localization scaffolding</strong> ∥ — keyboard nav, a11y roles, i18n string extraction. Deps: M1-T01. Refs: D§5 M9. Accept: a11y audit passes baseline; strings externalized. Verify: axe + i18n lint.</li>
+<li>[ ] <strong>M9-T05 — Telemetry (opt-in) + crash reporting</strong> ∥ — privacy-respecting, offline-safe, opt-in diagnostics; crash reports. Deps: M0-T02. Refs: D§5 M9, CLAUDE.md invariant 3. Accept: telemetry fully optional and offline-safe; no PII. Verify: offline test still green with telemetry on.</li>
+<li>[ ] <strong>M9-T06 — Docs completeness</strong> ∥ — user docs are a parity feature; cover every shipped feature. Deps: features complete. Refs: D§9 (docs = moat). Accept: every checklist feature documented. Verify: docs lint/coverage.</li>
+</ul>
+<p><strong>M9 exit:</strong> parity checklist (§7 of dev-plan) ≥90% "at parity"; no P0/P1 open; <strong>GA</strong>. (D§5 M9)</p>
+<hr>
+<h2 id="commercialization-workstream-parallel-to-engineering-product-owned">Commercialization workstream (parallel to engineering — product-owned)</h2>
+<ul>
+<li>[ ] <strong>CM-T01 — Licensing/DRM with offline grace</strong> — server-issued signed licenses; offline grace period that never breaks the offline invariant; tiers mirroring market (GCode "Core" vs DSP+galvo "Pro"). Refs: D§9, F§8 (pricing anchor). Accept: license validates offline within grace; tier gating enforced client+server. Verify: license test matrix incl. offline.</li>
+<li>[ ] <strong>CM-T02 — Onboarding &amp; machine auto-detect</strong> — machine auto-detect, one-click Agent install for DSP/galvo, camera setup wizard, <code>.lbrn</code> import path. Refs: D§9. Accept: new user reaches first cut with minimal steps; DSP users guided to Agent. Verify: onboarding e2e.</li>
+<li>[ ] <strong>CM-T03 — Positioning &amp; store copy</strong> — market the offline + cross-platform seam; do NOT reference the unverified "blocklist" claim. Refs: F§8 (positioning, unverified premise), D§9. Accept: copy avoids trademark/unverified claims; IP-counsel reviewed. Verify: brand/legal review.</li>
+<li>[ ] <strong>CM-T04 — IP clearance gate (pre-GA)</strong> — USPTO patent clearance search; clean-room attestations; trademark avoidance review. Refs: F§7 (legal), D§10 risk #8. Accept: clearance completed; counsel sign-off before GA. Verify: legal checklist.</li>
+</ul>
+<hr>
+<h2 id="dependency-spine-critical-path">Dependency spine (critical path)</h2>
+<p><code>M0 → M1 → M2 → M3 (MVP ship) → M4 → {M5 ∥ M6} → M7 → M8 → M9 (GA)</code><br>
+Camera (M5) and image engraving (M6) run in parallel after M4. Commercialization (CM) runs alongside from M2; CM-T04 is a hard gate before GA.</p>
+<h2 id="parity-coverage-guarantee">Parity coverage guarantee</h2>
+<p>Every row of the dev-plan §7 checklist maps to a task here: design/vector→M1; CAM/output→M2 (+.rd M4, galvo M7); image engraving→M6; device control→M3/M4/M7; camera→M5; print-and-cut/rotary→M8; platform/offline→M0 (+Agent M4). The one permanent gap — <strong>Chromium-only reach</strong> — is structural and documented, not a task.</p>
+<h2 id="status-legend">Status legend</h2>
+<p><code>[ ]</code> not started · <code>[~]</code> in progress (note owner) · <code>[x]</code> done (golden/offline/conformance green, acceptance met). Keep this file's checkboxes current — it is the single source of execution truth.</p>
+    </main>
+    <div class="doc-foot">house-style · converted from 03-implementation-plan.md · self-contained · bin/md2html.py</div>
+  </div>
+</body>
+</html>
