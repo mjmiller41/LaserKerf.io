@@ -46,6 +46,7 @@ packages/geometry-wasm/wasm-build/
 .claude/
 # >>> conductor-baseline (managed — do not edit between markers)
 .env*
+*.env
 *.key
 *.pem
 *_rsa
@@ -57,4 +58,9 @@ secrets.local.*
 .worktrees/
 __pycache__/
 *.pyc
+# .conductor/ is worker scratch (resume notes, worktrees, logs) — ignore it,
+# but ALWAYS keep the committed secrets manifest. Note: exclude the dir's
+# *contents* (.conductor/*), never the dir itself, or the negation can't win.
+.conductor/*
+!.conductor/secrets.yaml
 # <<< conductor-baseline
